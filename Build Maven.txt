@@ -1,0 +1,4 @@
+cd C:\DEV\sonar-ps-plugin_0.5.3_hs\sonar-ps-plugin
+mvn install
+
+mvn clean install -U
