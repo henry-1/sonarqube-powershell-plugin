@@ -1,0 +1,2 @@
+# sonarqube-powershell-plugin
+
