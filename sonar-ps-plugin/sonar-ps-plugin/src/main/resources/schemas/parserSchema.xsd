@@ -1,0 +1,29 @@
+
+
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Tokens">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Token" maxOccurs="unbounded" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="Text"/>
+              <xs:element type="xs:string" name="Value"/>
+              <xs:element type="xs:string" name="TokenFlags"/>
+              <xs:element type="xs:string" name="Kind"/>
+              <xs:element type="xs:int" name="StartLineNumber"/>
+              <xs:element type="xs:string" name="CType"/>
+              <xs:element type="xs:int" name="EndLineNumber"/>
+              <xs:element type="xs:int" name="StartOffset"/>
+              <xs:element type="xs:int" name="EndOffset"/>
+              <xs:element type="xs:int" name="StartColumnNumber"/>
+              <xs:element type="xs:int" name="EndColumnNumber"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute type="xs:int" name="complexity"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+

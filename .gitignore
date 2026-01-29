@@ -34,8 +34,10 @@ build/
 [Bb]in/
 [Oo]bj/
 **/packages/**
-target/
-.settings/
+**/target/
+**/.settings/
+**/.scannerwork
+
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
@@ -69,6 +71,9 @@ target/
 *.scc
 
 *.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
 
 # Jar, War, Ear files
 *.jar
