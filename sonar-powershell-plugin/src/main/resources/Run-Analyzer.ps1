@@ -5,7 +5,8 @@ param(
 	[string]$includeCustomRules = "0",
 	[string]$customRulesPath = [string]::Empty,
 	[string]$runPester = "0",
-	[string]$debugOutputEnabled = "0"
+	[string]$debugOutputEnabled = "0",
+    [string]$removeTempFiles = "1"
 )
 
 function ConvertTo-Boolean
@@ -92,7 +93,7 @@ function ConvertTo-SonarQubeDiagnisticFile
     $coverageResults = [xml] (Get-Content -Path $CoverageReportFile)
     $folders = $coverageResults | Select-Xml -XPath "//package "
 
-	$pesterCoverageReportPath = Join-Path $artifactsDir -ChildPath "TestsCoverage.JaCoCo.xml"
+	$pesterCoverageReportPath = Join-Path $artifactsDir -ChildPath "SonarCodeCoverage.xml"
 
 	Write-Host "Generating Coverage Report: $pesterCoverageReportPath"
 	$xmlWriter = Open-XmlWriter -Path $pesterCoverageReportPath
@@ -142,7 +143,7 @@ function Get-CodeCoverageReport
                 $xmlWriter.WriteStartElement("lineToCover")
                 $xmlWriter.WriteAttributeString("lineNumber",$line.node.nr)
                 $covered = (0 -lt [int]$line.node.ci)
-                $xmlWriter.WriteAttributeString("covered",$covered)
+                $xmlWriter.WriteAttributeString("covered",$covered.ToString().ToLower())
                 $xmlWriter.WriteEndElement()                  # lineToCover
             }
             $xmlWriter.WriteEndElement()                      # </file>
@@ -362,6 +363,13 @@ write-Verbose "Starting code coverage report generation."
 # $pesterTestReportFile -> C:\DEV\sonar-ps-test\artifacts\PesterTestReport.xml
 # $coverageReportFile -> C:\DEV\sonar-ps-test\artifacts\PesterTestCoverage.xml
 ConvertTo-SonarQubeDiagnisticFile -PesterTestReportFile $pesterTestReportFile -CoverageReportFile $coverageReportFile
+
+
+if(ConvertTo-Boolean -Value $removeTempFiles){
+    Write-Verbose "Removing temporary files."
+    #Remove-Item -Path $pesterTestReportFile -Force -ErrorAction SilentlyContinue -Confirm:$false
+    #Remove-Item -Path $coverageReportFile -Force -ErrorAction SilentlyContinue -Confirm:$false
+}
 
 
 #endregion Pester Execution

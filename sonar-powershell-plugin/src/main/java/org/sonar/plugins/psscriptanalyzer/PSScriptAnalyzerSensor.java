@@ -51,6 +51,9 @@ public class PSScriptAnalyzerSensor implements Sensor {
 		Boolean debugOutputEnabled = config
 				.getBoolean(Constants.CONFIGURAITON_PROPERTY_DEBUGOUTPUTENABLED)
 				.orElse(false);
+		Boolean removeTempFiles = config
+				.getBoolean(Constants.CONFIGURAITON_PROPERTY_REMOVETEMPFILES)
+				.orElse(true);
 		
 	    FileSystem fs = context.fileSystem();
 	    File baseDir = fs.baseDir();
@@ -63,7 +66,8 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	        // Define output JSON in the system temp folder
 	        String tmpRoot = System.getProperty("java.io.tmpdir");
 	        File outFile = new File(tmpRoot, "psa-findings.json");
-	        //outFile.deleteOnExit();
+	        if(removeTempFiles)
+	        	outFile.deleteOnExit();
 	        
 	        if(debugOutputEnabled)
 	        {
@@ -146,13 +150,8 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	                .message(finding.getMessage())
 	                .at(inputFile.selectLine(findingAtLine));
 	            
-//	            NewQuickFix quickFix = issue.newQuickFix()
-//	            	    .message("Use singular noun instead of plural")
-//	            	    .cost(2); // optional: estimate effort
-	            
 	            issue.at(location)
 	            	.overrideSeverity(mapSeverity(finding.getSeverity()))
-//	            	.addQuickFix(quickFix)
 	                .save();
 	        }
 	
@@ -166,8 +165,14 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	 * Extracts the bundled PowerShell script to a temp file
 	 */
 	private File extractScript() throws IOException {
+		
+		Boolean removeTempFiles = config
+				.getBoolean(Constants.CONFIGURAITON_PROPERTY_REMOVETEMPFILES)
+				.orElse(true);
+		
 	    File tempScript = File.createTempFile("Run-Analyzer", ".ps1");
-	    //tempScript.deleteOnExit();
+	    if(removeTempFiles)
+	    	tempScript.deleteOnExit();
 	
 	    try (InputStream in = getClass().getResourceAsStream("/Run-Analyzer.ps1");
 	         OutputStream out = new FileOutputStream(tempScript)) {
@@ -226,6 +231,10 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	 */
 	private void runScriptAnalyzer(File baseDir, File scriptFile, File outFile) throws IOException, InterruptedException {
 	    
+		Boolean removeTempFiles = config
+				.getBoolean(Constants.CONFIGURAITON_PROPERTY_REMOVETEMPFILES)
+				.orElse(true);
+		
 		String customRulesPath = config
                 .get(Constants.CONFIGURAITON_PROPERTY_CUSTOMRULESPATH)
                 .orElse("");
@@ -275,6 +284,8 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	    command.add(runPesterTests ? "1" : "0");	    
 	    command.add("-debugOutputEnabled");
 	    command.add(debugOutputEnabled ? "1" : "0");
+	    command.add("-removeTempFiles");
+	    command.add(removeTempFiles ? "1" : "0");
 	    
 	    
 	    ProcessBuilder pb = new ProcessBuilder(command)

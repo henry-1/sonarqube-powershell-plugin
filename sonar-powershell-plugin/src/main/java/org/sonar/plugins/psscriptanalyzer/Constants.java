@@ -26,6 +26,11 @@ public class Constants {
 	public static final String CONFIGURAITON_DEBUGOUTPUTENABLED_DEFAULT_VALUE = "false";
 	public static final String CONFIGURAITON_DEBUGOUTPUTENABLED_DESCRIPTION = "Enable Debug Out of Analyzer Run Cycle.";
 	
+	public static final String CONFIGURAITON_PROPERTY_REMOVETEMPFILES = "psscriptanalyzer.removetempfiles";
+	public static final String CONFIGURAITON_PROPERTY_REMOVETEMPFILES_NAME = "Remove Intermediate Files";
+	public static final String CONFIGURAITON_REMOVETEMPFILES_DEFAULT_VALUE = "true";
+	public static final String CONFIGURAITON_REMOVETEMPFILES_DESCRIPTION = "Remove intermediate Files after Scan.";
+	
 	public static final String CONFIGURATION_PROPERTY_SUBCATEGORY = "Rules";
 	
 	public static final String REPOSITORY_NAME = "PSScriptAnalyzer";
