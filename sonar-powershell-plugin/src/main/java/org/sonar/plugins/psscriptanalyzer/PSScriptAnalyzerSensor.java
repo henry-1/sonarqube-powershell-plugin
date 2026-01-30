@@ -121,8 +121,8 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	            if(debugOutputEnabled)
 	            	System.out.println(
 	        		    "[PSA ISSUE] rule=" + ruleKey +
-	        		    ", file=" + inputFile.relativePath() +
-	        		    ", abs=" + inputFile.absolutePath() +
+	        		    ", file=" + inputFile.uri().getPath() +
+	        		    ", abs=" + inputFile.uri().getPath() +
 	        		    ", line=" + finding.getLine() +
 	        		    ", severity=" + finding.getSeverity() +
 	        		    ", message=" + finding.getMessage()
@@ -134,7 +134,7 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	            	if(debugOutputEnabled)
 		                System.out.println(
 		                    "Skipping invalid line " + findingAtLine +
-		                    " for file " + inputFile.relativePath()
+		                    " for file " + inputFile.uri().getPath()
 	                );
 	                continue;
 	            }
@@ -255,7 +255,10 @@ public class PSScriptAnalyzerSensor implements Sensor {
 				.getBoolean(Constants.CONFIGURAITON_PROPERTY_DEBUGOUTPUTENABLED)
 				.orElse(false);
 		
-		//String customRulesPath = "C:\\DEV\\PSScriptAnalyzerRules\\*.psm1";
+		String excludeRule = config
+                .get(Constants.CONFIGURAITON_PROPERTY_EXCLUDERULE)
+                .orElse("")
+                .replaceAll("\\s+", ""); // remove all spaces, tabs, newlines
 		
 		List<String> command = new ArrayList<>();
 	    command.add("powershell.exe");
@@ -275,18 +278,21 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	    command.add(enableCustomRules ? "1" : "0");
 	    
 	    command.add("-CustomRulesPath");
-	    if (!customRulesPath.isBlank()) 
+	    if (customRulesPath != null && !customRulesPath.isBlank()) 
 	    {	        
 	        command.add(customRulesPath.replace("\\", "/"));
+	    }
+	    
+	    if(excludeRule != null && !excludeRule.isBlank())
+	    {
+	    	command.add("-excludeRule");
+	    	command.add(excludeRule);
 	    }
 	    
 	    command.add("-runPester");
 	    command.add(runPesterTests ? "1" : "0");	    
 	    command.add("-debugOutputEnabled");
-	    command.add(debugOutputEnabled ? "1" : "0");
-	    command.add("-removeTempFiles");
-	    command.add(removeTempFiles ? "1" : "0");
-	    
+	    command.add(debugOutputEnabled ? "1" : "0");	        
 	    
 	    ProcessBuilder pb = new ProcessBuilder(command)
 		    		.inheritIO()

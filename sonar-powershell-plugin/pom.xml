@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.henrys.sonar.psscriptanalyzer</groupId>
 	<artifactId>sonar-psscriptanalyzer-plugin</artifactId>
-	<version>0.0.3</version>
+	<version>0.3.0</version>
 	<name>PSScriptAnalyzer Plugin</name>
 	<description>PSScriptAnalyzer Integration for SonarQube</description>
   
@@ -14,6 +14,7 @@
 		https://repo1.maven.org/maven2/org/sonarsource/api/plugin/sonar-plugin-api/
   -->
   <properties>
+  	<sonar.server.version>9.9.0</sonar.server.version>
     <sonar.api.version>10.0.0.695</sonar.api.version>
     <!-- <sonar.api.version>9.9.0.229</sonar.api.version> -->
     <!-- <sonar.api.version>13.4.3.4290</sonar.api.version> -->
@@ -71,18 +72,23 @@
         <version>3.3.0</version>
         <configuration>
           <archive>
+	          <manifest>
+	            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+	            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+	          </manifest>
             <manifestEntries>
+            	<Implementation-Version>${project.version}</Implementation-Version>
               <Plugin-Class>
                 org.sonar.plugins.psscriptanalyzer.PSScriptAnalyzerPlugin
               </Plugin-Class>
               <Plugin-Key>sonar-psscriptanalyzer</Plugin-Key>
               <Plugin-Name>PSScriptAnalyzer Plugin</Plugin-Name>
               <Plugin-Version>${project.version}</Plugin-Version>
-              <Sonar-Version>9.9</Sonar-Version>
+              <Sonar-Version>${sonar.server.version}</Sonar-Version>
 			  <Plugin-Description>PSScriptAnalyzer Integration</Plugin-Description>
 			  <Plugin-License>Apache-2.0</Plugin-License>
 			  <Plugin-Developers>Henry S.</Plugin-Developers>
-			  <Plugin-Homepage>https://github.com/henry/sonar-psscriptanalyzer-plugin</Plugin-Homepage>
+			  <Plugin-Homepage>https://github.com/henry-1/sonarqube-powershell-plugin</Plugin-Homepage>
             </manifestEntries>
           </archive>
         </configuration>

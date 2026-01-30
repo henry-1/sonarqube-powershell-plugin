@@ -10,6 +10,9 @@ public class PSScriptAnalyzerPlugin implements Plugin {
     @Override
     public void define(Context context) {
     	
+    	String version = getClass().getPackage().getImplementationVersion();
+        System.out.println("PSScriptAnalyzer Plugin Version: " + version);
+    	
     	context.addExtensions(
             PropertyDefinition.builder(Constants.CONFIGURAITON_PROPERTY_CUSTOMRULESPATH)
                 .name(Constants.CONFIGURAITON_PROPERTY_CUSTOMRULESPATH_NAME)
@@ -36,6 +39,16 @@ public class PSScriptAnalyzerPlugin implements Plugin {
 	            .description(Constants.CONFIGURAITON_DEFAULTRULESENABLED_DESCRIPTION)
 	            .type(PropertyType.BOOLEAN)
 	            .defaultValue(Constants.CONFIGURAITON_DEFAULTRULESENABLED_DEFAULT_VALUE)
+	            .category(Constants.REPOSITORY_NAME)
+	            .subCategory(Constants.CONFIGURATION_PROPERTY_SUBCATEGORY)
+	            .onQualifiers(Qualifiers.PROJECT)
+	            .build()
+            ,
+	        PropertyDefinition.builder(Constants.CONFIGURAITON_PROPERTY_EXCLUDERULE)
+	            .name(Constants.CONFIGURAITON_PROPERTY_EXCLUDERULE_NAME)
+	            .description(Constants.CONFIGURAITON_EXCLUDERULE_DESCRIPTION)
+	            .type(PropertyType.TEXT)
+	            .defaultValue(Constants.CONFIGURAITON_DEFAULEXCLUDERULE_DEFAULT_VALUE)
 	            .category(Constants.REPOSITORY_NAME)
 	            .subCategory(Constants.CONFIGURATION_PROPERTY_SUBCATEGORY)
 	            .onQualifiers(Qualifiers.PROJECT)
@@ -78,5 +91,6 @@ public class PSScriptAnalyzerPlugin implements Plugin {
     	
     	context.addExtensions(PowershellQualityProfile.class,
     			PSScriptAnalyzerSensor.class);
+    	
     }
 }

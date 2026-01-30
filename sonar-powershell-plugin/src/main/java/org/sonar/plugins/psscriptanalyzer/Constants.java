@@ -16,6 +16,11 @@ public class Constants {
 	public static final String CONFIGURAITON_DEFAULTRULESENABLED_DEFAULT_VALUE = "true";
 	public static final String CONFIGURAITON_DEFAULTRULESENABLED_DESCRIPTION = "Enable default Rules for PSScriptAnalyzer.";
 	
+	public static final String CONFIGURAITON_PROPERTY_EXCLUDERULE = "psscriptanalyzer.exclude.rule";
+	public static final String CONFIGURAITON_PROPERTY_EXCLUDERULE_NAME = "Exclude Rule";
+	public static final String CONFIGURAITON_DEFAULEXCLUDERULE_DEFAULT_VALUE = "";
+	public static final String CONFIGURAITON_EXCLUDERULE_DESCRIPTION = "Comma-seperated list of Rule Names to be excluded from Scan.";
+	
 	public static final String CONFIGURAITON_PROPERTY_PESTERENABLED = "psscriptanalyzer.pester.enabled";
 	public static final String CONFIGURAITON_PROPERTY_PESTERENABLED_NAME = "Run Pester";
 	public static final String CONFIGURAITON_PESTERENABLED_DEFAULT_VALUE = "false";

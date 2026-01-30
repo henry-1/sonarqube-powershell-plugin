@@ -4,9 +4,9 @@ param(
 	[string]$includeDefaultRules = "1",
 	[string]$includeCustomRules = "0",
 	[string]$customRulesPath = [string]::Empty,
+	[string]$excludeRule = [string]::Empty,
 	[string]$runPester = "0",
-	[string]$debugOutputEnabled = "0",
-    [string]$removeTempFiles = "1"
+	[string]$debugOutputEnabled = "0"
 )
 
 function ConvertTo-Boolean
@@ -34,6 +34,12 @@ $params = @{
 	IncludeDefaultRules =  ConvertTo-Boolean -Value $includeDefaultRules
 }
 
+if(-not [string]::IsNullOrEmpty($excludeRule))
+{
+    $excludedRuleList = $excludeRule -split ","
+	$params.Add("ExcludeRule", $excludedRuleList)
+}
+
 if(-not [string]::IsNullOrEmpty($customRulesPath)) {
 	if((ConvertTo-Boolean -Value $includeCustomRules)) {
 		if((Test-Path -Path $customRulesPath)) {
@@ -55,12 +61,20 @@ $results = Invoke-ScriptAnalyzer @params |
                   Line,
                   Message
 
+
 Write-Host "Writing results to: $outputDir"
-$results | ConvertTo-Json -Depth 5 | Out-File $outputDir -Encoding UTF8
+$fileContent = $results | ConvertTo-Json -Depth 5
+if ($fileContent -notmatch '^\s*\[') {
+    $fileContent = "[$fileContent]"
+}
+
+$fileContent | Out-File $outputDir -Encoding UTF8
 
 if(-not (ConvertTo-Boolean -Value $runPester)) {
 	exit
 }
+
+Copy-Item -Path $outputDir -Destination (Join-Path $inputDir -ChildPath "artifacts/ScriptAnalyzerFindings.json") -Force
 
 $pesterModule = Get-Module -ListAvailable -ErrorAction SilentlyContinue | where-Object { $_.Name -eq 'Pester' }
 if($null -eq $pesterModule -or $pesterModule.Version.ToString() -lt '5.5.0'){
@@ -330,6 +344,7 @@ if(-not (Test-Path -Path $artifactsPath)) {
 Write-Verbose "Running Pester tests in path: $testsPath"
 
 # https://pester-docs.netlify.app/docs/commands/New-PesterConfiguration
+
 $configuration = @{
     Run = @{
         PassThru = $false
@@ -354,22 +369,51 @@ $configuration = @{
         Verbosity = 'Normal'           # Detailed, Normal, Filtered, Auto, Error
     }
 }
+
 $config = New-PesterConfiguration -Hashtable $configuration
 Invoke-Pester -Configuration $config
 
-write-Verbose "Pester test report written to: $pesterTestReportFile"
+<#
+# normalize project root: forward slashes and lowercase
+$normalizedInputDir = ($inputDir -replace '\\','/').ToLower()
+
+[xml]$xml = Get-Content $coverageReportFile
+
+if ($xml.DocumentType) {
+    $xml.RemoveChild($xml.DocumentType) | Out-Null
+}
+
+foreach ($package in $xml.report.package) {
+
+    # fix package name
+    $packageNameNormalized = ($package.name -replace '\\','/').ToLower()
+    if ($packageNameNormalized -eq $normalizedInputDir -or $packageNameNormalized.StartsWith($normalizedInputDir + "/")) {
+        $package.name = "."
+    }
+
+    # fix class names
+    foreach ($class in $package.class) {
+     # normalize class name for comparison
+        $classNameNormalized = ($class.name -replace '\\','/').ToLower()
+
+        # remove project root prefix if it matches
+        if ($classNameNormalized.StartsWith($normalizedInputDir)) {
+            $relativePath = $classNameNormalized.Substring($normalizedInputDir.Length).TrimStart('/')
+            $class.name = $relativePath
+        }
+    }
+}
+
+
+$xml.Save($coverageReportFile)
+#>
+
+write-Verbose "Pester test report written to: $coverageReportFile"
 write-Verbose "Starting code coverage report generation."
 
 # $pesterTestReportFile -> C:\DEV\sonar-ps-test\artifacts\PesterTestReport.xml
 # $coverageReportFile -> C:\DEV\sonar-ps-test\artifacts\PesterTestCoverage.xml
 ConvertTo-SonarQubeDiagnisticFile -PesterTestReportFile $pesterTestReportFile -CoverageReportFile $coverageReportFile
-
-
-if(ConvertTo-Boolean -Value $removeTempFiles){
-    Write-Verbose "Removing temporary files."
-    #Remove-Item -Path $pesterTestReportFile -Force -ErrorAction SilentlyContinue -Confirm:$false
-    #Remove-Item -Path $coverageReportFile -Force -ErrorAction SilentlyContinue -Confirm:$false
-}
 
 
 #endregion Pester Execution
