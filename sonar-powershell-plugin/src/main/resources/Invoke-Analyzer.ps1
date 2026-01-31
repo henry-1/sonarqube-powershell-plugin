@@ -1,14 +1,15 @@
 param(
-	[string]$inputDir,
-	[string]$outputDir,
+	[string]$inputDir = "C:\DEV\sonar-ps-test",
+	[string]$outputDir = $env:TEMP + "\ScriptAnalyzerFindings.json",
 	[string]$includeDefaultRules = "1",
 	[string]$includeCustomRules = "0",
 	[string]$customRulesPath = [string]::Empty,
 	[string]$excludeRule = [string]::Empty,
-	[string]$runPester = "0",
+	[string]$runPester = "1",
 	[string]$debugOutputEnabled = "0"
 )
 
+#region PSScriptAnalyzer Execution
 function ConvertTo-Boolean
 {
 	param(
@@ -55,11 +56,11 @@ if(-not [string]::IsNullOrEmpty($customRulesPath)) {
 Write-Host "PS: Analyzing scripts in directory: $inputDir"
 
 $results = Invoke-ScriptAnalyzer @params |
-    Select-Object RuleName,
-                  @{ Name = 'Severity'; Expression = { $_.Severity.ToString() } },
-                  ScriptName,
-                  Line,
-                  Message
+    Select-Object RuleName,               
+                @{ Name = 'Severity'; Expression = { $_.Severity.ToString() } },
+                ScriptName,
+                Line,
+                Message
 
 
 Write-Host "Writing results to: $outputDir"
@@ -69,6 +70,9 @@ if ($fileContent -notmatch '^\s*\[') {
 }
 
 $fileContent | Out-File $outputDir -Encoding UTF8
+
+#endregion PSScriptAnalyzer Execution
+
 
 if(-not (ConvertTo-Boolean -Value $runPester)) {
 	exit
@@ -83,7 +87,7 @@ if($null -eq $pesterModule -or $pesterModule.Version.ToString() -lt '5.5.0'){
 }
 
 #region Pester Functions
-function ConvertTo-SonarQubeDiagnisticFile
+function ConvertTo-SonarQubeDiagnosticFile
 {
 	param(
 		[string]$PesterTestReportFile,
@@ -94,9 +98,8 @@ function ConvertTo-SonarQubeDiagnisticFile
 	$testSuites = $testResults | Select-Xml -Xpath "//testsuite"
     $tests = Get-Tests -TestSuites $testSuites
 
-	# $pesterExecutionReportPath -> C:\DEV\sonar-ps-test\artifacts\PesterExecutionReport.xml
 	$artifactsDir = Split-Path -Path $PesterTestReportFile -Parent
-	$pesterExecutionReportPath = Join-Path $artifactsDir -ChildPath "PesterExecutionReport.xml"
+	$pesterExecutionReportPath = Join-Path $artifactsDir -ChildPath "SonarExecutionReport.xml"
     Write-Host "Generating Pester Execution Report: $pesterExecutionReportPath"
 
 	$xmlWriter = Open-XmlWriter -Path $pesterExecutionReportPath
@@ -354,6 +357,7 @@ $configuration = @{
     CodeCoverage = @{
         Enabled = $true
         Path = @('./*.ps*','modules/*.ps*')
+        RecursePaths = $true
         OutputPath = $coverageReportFile
         OutputFormat = 'CoverageGutters'       # JaCoCo, CoverageGutters
         OutputEncoding = 'UTF8'
@@ -411,9 +415,7 @@ $xml.Save($coverageReportFile)
 write-Verbose "Pester test report written to: $coverageReportFile"
 write-Verbose "Starting code coverage report generation."
 
-# $pesterTestReportFile -> C:\DEV\sonar-ps-test\artifacts\PesterTestReport.xml
-# $coverageReportFile -> C:\DEV\sonar-ps-test\artifacts\PesterTestCoverage.xml
-ConvertTo-SonarQubeDiagnisticFile -PesterTestReportFile $pesterTestReportFile -CoverageReportFile $coverageReportFile
+ConvertTo-SonarQubeDiagnosticFile -PesterTestReportFile $pesterTestReportFile -CoverageReportFile $coverageReportFile
 
 
 #endregion Pester Execution

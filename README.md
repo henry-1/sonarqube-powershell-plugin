@@ -30,7 +30,7 @@ In my projects I use this folder structure.
 - 'project' is the root folder. It can be named as you like. This folder contains the files and folders to be scanned by PSScriptAnalyzer and Pester. Inclusions and exclusions are explained below.
 - 'artifacts' is the folder for the files transferred to Sonarqube at the end of the scan process.
 - 'tests' folder contains the Pester test files.
-- 'lib' folder is just to make clear that it is possible to have scripts and modules also in subfolders.
+- 'modules' folder is required. You can have additional scripts or modules in this folder.
 
 The process also creates intermediate files. These files are located in the users %temp% folder.
 
@@ -39,7 +39,7 @@ project/
  -  artifacts/
  -  tests/
      - my-script-to-be-analyzed.Tests.ps1
- -  lib/
+ -  modules/
      - my-other-module-to-ba-analyzed.psm1
  - sonar-project.properties
  - my-script-to-be-analyzed.ps1
@@ -48,10 +48,10 @@ project/
 ```
 
 ## PSScriptAnalyzer
-Works with PSScriptAnalyzer Version 1.24.0
+- works with PSScriptAnalyzer Version 1.24.0
 
 ## Pester
-Works with Pester Version 5.7.1
+- works with Pester Version 5.7.1
 
 # Configuration
 You can configure the Plugin in Sonarqube GUI or you can set it the sonar-project.properties file.
@@ -85,7 +85,8 @@ The following options are important to run the plugin:
 | 16 | psscriptanalyzer.customrules.enabled | true | determines if custom rules are used to analyze the scripts |
 | 17 | psscriptanalyzer.defaultrules.enabled | true | can be used to only run custom rules and ignore the PSScriptanalyzer default rules |
 | 18 | psscriptanalyzer.debugoutput.enabled | false | produces a lot more output during scan when set to true |
-| 19 | psscriptanalyzer.pester.enabled | true | runs Pester after PSScriptAnalyzer has finished |
+| 19 | psscriptanalyzer.exclude.rule | | A comma-seperated list of PSScriptAnalyzer Rule Names that will be skipped |
+| 20 | psscriptanalyzer.pester.enabled | true | runs Pester after PSScriptAnalyzer has finished |
 
 Settings starting with 'psscriptanalyzer' can also be found and set Sonarqube GUI
 

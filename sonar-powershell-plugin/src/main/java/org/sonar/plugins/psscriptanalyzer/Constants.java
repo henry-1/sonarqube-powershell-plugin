@@ -1,6 +1,6 @@
 package org.sonar.plugins.psscriptanalyzer;
 
-public class Constants {
+public final class Constants {
 	public static final String CONFIGURAITON_PROPERTY_CUSTOMRULESPATH = "psscriptanalyzer.customrules.path";
 	public static final String CONFIGURAITON_PROPERTY_CUSTOMRULESPATH_NAME = "Custom Rules Path";
 	public static final String CONFIGURAITON_CUSTOMRULESPATH_DEFAULT_VALUE = "c:\\DEV\\PSScriptAnalyzerRules\\*.psm1";

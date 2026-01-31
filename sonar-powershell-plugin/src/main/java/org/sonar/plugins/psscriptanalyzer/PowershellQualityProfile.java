@@ -8,6 +8,7 @@ public class PowershellQualityProfile implements BuiltInQualityProfilesDefinitio
         NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(
         		Constants.QUALITY_PROFILE_NAME, 
         		Constants.PROGRAMMING_LANGUAGE);
+        profile.setDefault(true);
 
      // Activate your generic PSA rule
         profile.activateRule(Constants.REPOSITORY_KEY, Constants.SENSOR_RULE_TYPE_GENERAL_PSA_ERROR);

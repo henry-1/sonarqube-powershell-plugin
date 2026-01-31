@@ -9,7 +9,6 @@ import org.sonar.api.batch.sensor.issue.NewIssue;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.batch.rule.Severity;
-
 import org.sonar.api.config.Configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,14 +20,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-
 import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 public class PSScriptAnalyzerSensor implements Sensor {
 
@@ -48,6 +46,7 @@ public class PSScriptAnalyzerSensor implements Sensor {
 
     @Override
 	public void execute(SensorContext context) {    	
+    	    	
 		Boolean debugOutputEnabled = config
 				.getBoolean(Constants.CONFIGURAITON_PROPERTY_DEBUGOUTPUTENABLED)
 				.orElse(false);
@@ -114,21 +113,12 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	        		if(debugOutputEnabled)
 	        			System.out.println("Skipping test file: " + finding.getScriptName());
 	                continue;
-	            }	        	
-	        	
-	            String ruleKey = ruleKeyForSeverity(finding.getSeverity());
+	            }		            
 	            
-	            if(debugOutputEnabled)
-	            	System.out.println(
-	        		    "[PSA ISSUE] rule=" + ruleKey +
-	        		    ", file=" + inputFile.uri().getPath() +
-	        		    ", abs=" + inputFile.uri().getPath() +
-	        		    ", line=" + finding.getLine() +
-	        		    ", severity=" + finding.getSeverity() +
-	        		    ", message=" + finding.getMessage()
-	        		);
-	            
+	        	String testName = finding.getTestName();
 	            int findingAtLine = Math.max(finding.getLine(), 1);
+	            String severity = finding.getSeverity();
+	            String message = finding.getMessage();
 
 	            if (findingAtLine > inputFile.lines()) {
 	            	if(debugOutputEnabled)
@@ -141,19 +131,33 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	            
 	            if(debugOutputEnabled)
 	            	System.out.println("File has " + inputFile.lines() + " lines. PSA line: " + findingAtLine);  
-	            	            
+	            
+	            String ruleKey = ruleKeyForSeverity(finding.getSeverity());
+	            
+	            if(debugOutputEnabled)
+	            	System.out.println(
+	        		    "[PSA ISSUE] rule=" + ruleKey +
+	        		    ", TestName=" + testName +
+	        		    ", file=" + inputFile.uri().getPath() +	        		    
+	        		    ", line=" + findingAtLine +
+	        		    ", severity=" + severity +
+	        		    ", message=" + message
+	        		);	            
+	            
 	            NewIssue issue = context.newIssue()
 	                .forRule(RuleKey.of(Constants.REPOSITORY_KEY, ruleKey));
 	                       
 	            NewIssueLocation location = issue.newLocation()
 	                .on(inputFile)
-	                .message(finding.getMessage())
+	                .message(message)	                
 	                .at(inputFile.selectLine(findingAtLine));
 	            
 	            issue.at(location)
-	            	.overrideSeverity(mapSeverity(finding.getSeverity()))
-	                .save();
+	            	.overrideSeverity(mapSeverity(severity))
+	                .save();	            
 	        }
+	        
+	        
 	
 	    } catch (Exception e) {
 	        System.err.println("Error running ScriptAnalyzer: " + e.getMessage());
@@ -170,15 +174,15 @@ public class PSScriptAnalyzerSensor implements Sensor {
 				.getBoolean(Constants.CONFIGURAITON_PROPERTY_REMOVETEMPFILES)
 				.orElse(true);
 		
-	    File tempScript = File.createTempFile("Run-Analyzer", ".ps1");
+	    File tempScript = File.createTempFile("Invoke-Analyzer", ".ps1");
 	    if(removeTempFiles)
 	    	tempScript.deleteOnExit();
 	
-	    try (InputStream in = getClass().getResourceAsStream("/Run-Analyzer.ps1");
+	    try (InputStream in = getClass().getResourceAsStream("/Invoke-Analyzer.ps1");
 	         OutputStream out = new FileOutputStream(tempScript)) {
 	
 	        if (in == null) {
-	            throw new IllegalStateException("Run-Analyzer.ps1 not found in resources");
+	            throw new IllegalStateException("Invoke-Analyzer.ps1 not found in resources");
 	        }
 	        in.transferTo(out);
 	    }
@@ -328,41 +332,17 @@ public class PSScriptAnalyzerSensor implements Sensor {
 
 	    List<RuleFinding> results = new ArrayList<>();
 	    for (Map<String, Object> item : psaResults) {
-	        String ruleName = (String) item.get("RuleName");
+	        String testName = (String) item.get("RuleName");
 	        String message = (String) item.get("Message");
 	        String scriptName = (String) item.get("ScriptName"); // relative path inside project
 	        int lineNumber = item.get("Line") != null ? (int) item.get("Line") : 1;
 	        String severity = item.get("Severity") != null ? (String)item.get("Severity") : "Error";
 
-	        results.add(new RuleFinding(ruleName, message, scriptName, lineNumber, severity));
+	        results.add(new RuleFinding(testName, message, scriptName, lineNumber, severity));
 	    }
 
 	    return results;
 	}
 	
-
-	/**
-	 * Data holder for a finding
-	 */
-	private static class RuleFinding {
-	    private final String testName;
-	    private final String message;
-	    private final String scriptName;
-	    private final int line;
-	    private final String severity; 
-
-	    public RuleFinding(String ruleKey, String message, String scriptName, int line, String severity) {
-	        this.testName = ruleKey;
-	        this.message = message;
-	        this.scriptName = scriptName;
-	        this.line = line;
-	        this.severity = severity;
-	    }
-
-	    public String getMessage() { return ("Test: " + testName + " -> " + message); }
-	    public String getScriptName() { return scriptName; }
-	    public int getLine() { return line; }
-	    public String getSeverity() { return severity; }
-	}
 }
 
