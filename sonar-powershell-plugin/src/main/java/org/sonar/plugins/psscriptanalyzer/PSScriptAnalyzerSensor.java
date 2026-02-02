@@ -3,16 +3,12 @@ package org.sonar.plugins.psscriptanalyzer;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
-import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.FileSystem;
-import org.sonar.api.batch.sensor.issue.NewIssue;
-import org.sonar.api.batch.sensor.issue.NewIssueLocation;
-import org.sonar.api.rule.RuleKey;
-import org.sonar.api.batch.rule.Severity;
-import org.sonar.api.config.Configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.sonar.api.config.Configuration;
+import org.sonar.plugins.psscriptanalyzer.fillers.IssuesFiller;
+import org.sonar.plugins.psscriptanalyzer.readers.FindingsReader;
+import org.sonar.plugins.psscriptanalyzer.types.PSFinding;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,18 +20,20 @@ import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 public class PSScriptAnalyzerSensor implements Sensor {
 
 	private final Configuration config;
-	private final FileSystem fileSystem;	
+	private FileSystem fs;	
 	
+	private final FindingsReader findingsReader = new FindingsReader();
+	private final IssuesFiller issuesFiller = new IssuesFiller();
+
     public PSScriptAnalyzerSensor(Configuration config, FileSystem fileSystem) {
     	this.config = config;
-        this.fileSystem = fileSystem;
+        this.fs = fileSystem;
     }
 
     @Override
@@ -54,7 +52,7 @@ public class PSScriptAnalyzerSensor implements Sensor {
 				.getBoolean(Constants.CONFIGURAITON_PROPERTY_REMOVETEMPFILES)
 				.orElse(true);
 		
-	    FileSystem fs = context.fileSystem();
+	    fs = context.fileSystem();
 	    File baseDir = fs.baseDir();
 	
 	    try {   	
@@ -76,94 +74,17 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	
 	        // Run PowerShell ScriptAnalyzer on entire baseDir
 	        runScriptAnalyzer(baseDir, scriptFile, outFile);
-	
+	        
 	        // Read findings from JSON
-	        List<RuleFinding> findings = readFindings(outFile);
-	        
-	        if(debugOutputEnabled)
-	        	System.out.println("Findings Count: " + findings.size());
-	        
-	        Map<String, InputFile> inputFilesByName = new HashMap<>();
-
-	        for (InputFile f : fs.inputFiles(fs.predicates().all())) {
-	            inputFilesByName.put(f.filename(), f);
-	        }
-	        
-	        for (RuleFinding finding : findings) {
-	        	
-	        	String findingPath = finding.getScriptName().replace("\\", "/");
-
-	        	// Try exact relative path (preferred & correct)
-	        	InputFile inputFile =
-	        	    fs.inputFile(fs.predicates().hasRelativePath(findingPath));
-
-	        	// Fallback ONLY if PSA returns filename only
-	        	if (inputFile == null) {
-	        	    inputFile = inputFilesByName.get(findingPath);
-	        	}
-
-	        	// If still not found → skip
-	        	if (inputFile == null) {
-	        		if(debugOutputEnabled)
-	        			System.out.println("Skipping finding, file not indexed: " + findingPath);
-	        	    continue;
-	        	}
-	        	
-	        	if (inputFile.type() == InputFile.Type.TEST) {
-	        		if(debugOutputEnabled)
-	        			System.out.println("Skipping test file: " + finding.getScriptName());
-	                continue;
-	            }		            
-	            
-	        	String testName = finding.getTestName();
-	            int findingAtLine = Math.max(finding.getLine(), 1);
-	            String severity = finding.getSeverity();
-	            String message = finding.getMessage();
-
-	            if (findingAtLine > inputFile.lines()) {
-	            	if(debugOutputEnabled)
-		                System.out.println(
-		                    "Skipping invalid line " + findingAtLine +
-		                    " for file " + inputFile.uri().getPath()
-	                );
-	                continue;
-	            }
-	            
-	            if(debugOutputEnabled)
-	            	System.out.println("File has " + inputFile.lines() + " lines. PSA line: " + findingAtLine);  
-	            
-	            String ruleKey = ruleKeyForSeverity(finding.getSeverity());
-	            
-	            if(debugOutputEnabled)
-	            	System.out.println(
-	        		    "[PSA ISSUE] rule=" + ruleKey +
-	        		    ", TestName=" + testName +
-	        		    ", file=" + inputFile.uri().getPath() +	        		    
-	        		    ", line=" + findingAtLine +
-	        		    ", severity=" + severity +
-	        		    ", message=" + message
-	        		);	            
-	            
-	            NewIssue issue = context.newIssue()
-	                .forRule(RuleKey.of(Constants.REPOSITORY_KEY, ruleKey));
-	                       
-	            NewIssueLocation location = issue.newLocation()
-	                .on(inputFile)
-	                .message(message)	                
-	                .at(inputFile.selectLine(findingAtLine));
-	            
-	            issue.at(location)
-	            	.overrideSeverity(mapSeverity(severity))
-	                .save();	            
-	        }
-	        
-	        
+	        List<PSFinding> findings = findingsReader.read(outFile);
+	        this.issuesFiller.fill(context, baseDir, findings, debugOutputEnabled);
 	
 	    } catch (Exception e) {
 	        System.err.println("Error running ScriptAnalyzer: " + e.getMessage());
 	        e.printStackTrace();
 	    }
 	}
+    
 
 	/**
 	 * Extracts the bundled PowerShell script to a temp file
@@ -190,45 +111,7 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	    return tempScript;
 	}
 	
-	private String ruleKeyForSeverity(String psaSeverity) {
-	    if (psaSeverity == null) {
-	        return Constants.SENSOR_RULE_TYPE_PSA_FINDING_ERROR;
-	    }
-
-	    switch (psaSeverity.toLowerCase()) {
-	        case "information":
-	            return Constants.SENSOR_RULE_TYPE_PSA_FINDING_INFO;
-
-	        case "warning":
-	            return Constants.SENSOR_RULE_TYPE_PSA_FINDING_WARNING;
-
-	        case "error":
-	            return Constants.SENSOR_RULE_TYPE_PSA_FINDING_ERROR;
-
-	        default:
-	            return Constants.SENSOR_RULE_TYPE_PSA_FINDING_ERROR;
-	    }
-	}	
-
-	private Severity mapSeverity(String psaSeverity) {
-		if (psaSeverity == null) {
-	        return Severity.MAJOR;
-	    }
-
-	    switch (psaSeverity.toLowerCase()) {
-	        case "information":
-	            return Severity.INFO;
-
-	        case "warning":
-	            return Severity.MINOR;
-
-	        case "error":
-	            return Severity.MAJOR;
-
-	        default:
-	            return Severity.MAJOR;
-	    }
-	}	
+	
 	
 	/**
 	 * Runs PowerShell ScriptAnalyzer on all scripts in the folder
@@ -320,29 +203,7 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	    }
 	}
 
-	/**
-	 * Reads the JSON output from ScriptAnalyzer
-	 */
-	private List<RuleFinding> readFindings(File jsonFile) throws IOException {
-	    ObjectMapper mapper = new ObjectMapper();
-	    List<Map<String, Object>> psaResults = mapper.readValue(
-	            jsonFile,
-	            new TypeReference<List<Map<String, Object>>>() {}
-	    );
-
-	    List<RuleFinding> results = new ArrayList<>();
-	    for (Map<String, Object> item : psaResults) {
-	        String testName = (String) item.get("RuleName");
-	        String message = (String) item.get("Message");
-	        String scriptName = (String) item.get("ScriptName"); // relative path inside project
-	        int lineNumber = item.get("Line") != null ? (int) item.get("Line") : 1;
-	        String severity = item.get("Severity") != null ? (String)item.get("Severity") : "Error";
-
-	        results.add(new RuleFinding(testName, message, scriptName, lineNumber, severity));
-	    }
-
-	    return results;
-	}
+	
 	
 }
 

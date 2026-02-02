@@ -90,7 +90,6 @@ public class PSScriptAnalyzerPlugin implements Plugin {
     			PSScriptAnalyzerRulesDefinition.class);
     	
     	context.addExtensions(PowershellQualityProfile.class,
-    			PSScriptAnalyzerSensor.class);
-    	
+    			PSScriptAnalyzerSensor.class);    	    	
     }
 }

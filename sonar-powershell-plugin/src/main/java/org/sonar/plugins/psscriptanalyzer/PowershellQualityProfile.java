@@ -3,6 +3,7 @@ package org.sonar.plugins.psscriptanalyzer;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
 
 public class PowershellQualityProfile implements BuiltInQualityProfilesDefinition {
+	
     @Override
     public void define(Context context) {
         NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(

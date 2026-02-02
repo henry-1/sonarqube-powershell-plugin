@@ -56,7 +56,7 @@ if(-not [string]::IsNullOrEmpty($customRulesPath)) {
 Write-Host "PS: Analyzing scripts in directory: $inputDir"
 
 $results = Invoke-ScriptAnalyzer @params |
-    Select-Object RuleName,               
+    Select-Object RuleName,
                 @{ Name = 'Severity'; Expression = { $_.Severity.ToString() } },
                 ScriptName,
                 Line,
@@ -353,6 +353,7 @@ $configuration = @{
         PassThru = $false
         Path = "$testsPath/*"
         TestExtension = '.Tests.ps1'
+        ExcludePath = "tests"
     }
     CodeCoverage = @{
         Enabled = $true

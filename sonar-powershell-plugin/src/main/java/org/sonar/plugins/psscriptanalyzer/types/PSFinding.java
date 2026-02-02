@@ -1,13 +1,13 @@
-package org.sonar.plugins.psscriptanalyzer;
+package org.sonar.plugins.psscriptanalyzer.types;
 
-public class RuleFinding {
+public class PSFinding {
     private final String testName;
     private final String message;
     private final String scriptName;
     private final int line;
     private final String severity; 
 
-    public RuleFinding(String testName, String message, String scriptName, int line, String severity) {
+    public PSFinding(String testName, String message, String scriptName, int line, String severity) {
         this.testName = testName;
         this.message = message;
         this.scriptName = scriptName;
