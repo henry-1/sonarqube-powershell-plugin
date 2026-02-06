@@ -132,12 +132,21 @@ Administration -> Configuration -> PSScriptAnalyzer
 
 # Illustration
 Here are a few pictures of my running instance.
+## Overview of Findings and Numbers per File
 ![Overview of Findings and Numbers per File](pictures/Project_Numbers_1.png)
+## PSScriptAnalyzer Finding in Detail
 ![PSScriptAnalyzer Finding in Detail](/pictures/Findings.png)
+## Complexity
 ![Complexity](/pictures/Project_Numbers_2.png)
+## File Size
 ![File Size](/pictures/Project_Numbers_3.png)
+## Duplicate Code Overview
 ![Duplicate Code Overview](/pictures/Project_Numbers_4.png)
+## Duplicate Code in Detail
 ![Duplicate Code in Detail](/pictures/Duplications.png)
+## Code Coverage
 ![Code Coverage](/pictures/Project_Numbers_5.png)
+## Maintainablility
 ![Maintainablility](/pictures/Project_Numbers_6.png)
+## Plugin Settings
 ![Plugin Settings](/pictures/Settings.png)
