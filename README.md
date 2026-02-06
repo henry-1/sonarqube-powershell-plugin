@@ -132,6 +132,9 @@ Administration -> Configuration -> PSScriptAnalyzer
 
 # Illustration
 Here are a few pictures of my running instance.
+## Code Highlighted for readability
+![Code highlited for readability](/pictures/Code_Highlighted.png)
+![Code highlited to point out problems](/pictures/Code_not_Covered_New_code.png)
 ## Overview of Findings and Numbers per File
 ![Overview of Findings and Numbers per File](pictures/Project_Numbers_1.png)
 ## PSScriptAnalyzer Finding in Detail
