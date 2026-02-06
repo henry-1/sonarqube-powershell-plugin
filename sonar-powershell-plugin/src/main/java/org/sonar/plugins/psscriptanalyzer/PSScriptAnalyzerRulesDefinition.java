@@ -1,5 +1,6 @@
 package org.sonar.plugins.psscriptanalyzer;
 
+import org.sonar.api.rule.RuleStatus;
 import org.sonar.api.rule.Severity;
 import org.sonar.api.rules.RuleType;
 import org.sonar.api.server.rule.RulesDefinition;
@@ -22,6 +23,7 @@ public class PSScriptAnalyzerRulesDefinition implements RulesDefinition {
         NewRule errorRule = repo.createRule(Constants.SENSOR_RULE_TYPE_GENERAL_PSA_ERROR)
             .setName("PSA Execution Error")
             .setType(RuleType.BUG)
+            .setStatus(RuleStatus.READY)            
             .setSeverity(Severity.BLOCKER)
             .setHtmlDescription("This issue occurs when PSScriptAnalyzer fails to execute.");
         errorRule.setDebtRemediationFunction(errorRule.debtRemediationFunctions().constantPerIssue(constantPerBugIssue));

@@ -4,6 +4,9 @@ import org.sonar.api.Plugin;
 import org.sonar.api.PropertyType;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;
+import org.sonar.plugins.psscriptanalyzer.sensors.PSScriptAnalyzerSensor;
+import org.sonar.plugins.psscriptanalyzer.sensors.PSTokenizerSensor;
+
 
 public class PSScriptAnalyzerPlugin implements Plugin {
 
@@ -90,6 +93,8 @@ public class PSScriptAnalyzerPlugin implements Plugin {
     			PSScriptAnalyzerRulesDefinition.class);
     	
     	context.addExtensions(PowershellQualityProfile.class,
-    			PSScriptAnalyzerSensor.class);    	    	
+    			PSScriptAnalyzerSensor.class);
+    	
+    	context.addExtension(PSTokenizerSensor.class);
     }
 }

@@ -1,4 +1,4 @@
-package org.sonar.plugins.psscriptanalyzer;
+package org.sonar.plugins.psscriptanalyzer.sensors;
 
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
@@ -6,6 +6,7 @@ import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.batch.fs.FileSystem;
 
 import org.sonar.api.config.Configuration;
+import org.sonar.plugins.psscriptanalyzer.Constants;
 import org.sonar.plugins.psscriptanalyzer.fillers.IssuesFiller;
 import org.sonar.plugins.psscriptanalyzer.readers.FindingsReader;
 import org.sonar.plugins.psscriptanalyzer.types.PSFinding;
@@ -38,7 +39,7 @@ public class PSScriptAnalyzerSensor implements Sensor {
 
     @Override
     public void describe(SensorDescriptor descriptor) {
-        descriptor.name(Constants.SENSOR_NAME)
+        descriptor.name(Constants.PSSCRIPTANALYZER_SENSOR_NAME)
                   .onlyOnLanguage(Constants.PROGRAMMING_LANGUAGE); // Must match RulesDefinition
     }
 
@@ -77,7 +78,8 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	        
 	        // Read findings from JSON
 	        List<PSFinding> findings = findingsReader.read(outFile);
-	        this.issuesFiller.fill(context, baseDir, findings, debugOutputEnabled);
+	        this.issuesFiller.fill(context, baseDir, findings, debugOutputEnabled);        
+	        
 	
 	    } catch (Exception e) {
 	        System.err.println("Error running ScriptAnalyzer: " + e.getMessage());
@@ -202,8 +204,6 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	        throw new RuntimeException("PowerShell ScriptAnalyzer failed with exit code " + exitCode);
 	    }
 	}
-
-	
 	
 }
 

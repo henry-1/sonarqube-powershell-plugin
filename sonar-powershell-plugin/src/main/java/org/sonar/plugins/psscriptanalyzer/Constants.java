@@ -1,6 +1,6 @@
 package org.sonar.plugins.psscriptanalyzer;
 
-public class Constants {
+public final class Constants {
 	public static final String CONFIGURAITON_PROPERTY_CUSTOMRULESPATH = "psscriptanalyzer.customrules.path";
 	public static final String CONFIGURAITON_PROPERTY_CUSTOMRULESPATH_NAME = "Custom Rules Path";
 	public static final String CONFIGURAITON_CUSTOMRULESPATH_DEFAULT_VALUE = "c:\\DEV\\PSScriptAnalyzerRules\\*.psm1";
@@ -41,7 +41,8 @@ public class Constants {
 	public static final String REPOSITORY_NAME = "PSScriptAnalyzer";
 	public static final String REPOSITORY_KEY = "psscriptanalyzer";
 	
-	public static final String SENSOR_NAME = "PowerShell Script Analyzer Sensor";
+	public static final String PSSCRIPTANALYZER_SENSOR_NAME = "PowerShell Script Analyzer Sensor";
+	public static final String TOKENIZER_SENSOR_NAME = "Powershell AST Token Sensor";
 	
 	public static final String SENSOR_RULE_TYPE_GENERAL_PSA_ERROR = "analyzer-error";	
 	public static final String SENSOR_RULE_TYPE_PSA_FINDING = "psscriptanalyzer-issue";	

@@ -2,3 +2,10 @@ cd C:\DEV\sonar-ps-plugin_0.5.3_hs\sonar-ps-plugin
 mvn install
 
 mvn clean install -U
+
+"C:\DEV\sonar-scanner\sonar-scanner\8.0.1.6346\bin\sonar-scanner.bat"
+
+http://sonarqube.example.com:8088/api/measures/component?component=psscriptanalyzer&metricKeys=coverage,lines_to_cover,uncovered_lines
+
+http://sonarqube.example.com:8088/api/measures/component_tree?component=psscriptanalyzer&s=metric&metricSort=ncloc&asc=false&ps=500&p=1&component=PROJECT_KEY&metricKeys=software_quality_maintainability_remediation_effort%2Ccoverage%2Cncloc%2Csoftware_quality_reliability_rating%2Csoftware_quality_security_rating&strategy=leaves
+
