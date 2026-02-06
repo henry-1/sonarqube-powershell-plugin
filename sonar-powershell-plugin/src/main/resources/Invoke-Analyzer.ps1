@@ -53,7 +53,7 @@ if(-not [string]::IsNullOrEmpty($customRulesPath)) {
 	}
 }
 
-Write-Host "PS: Analyzing scripts in directory: $inputDir"
+Write-Verbose "PS: Analyzing scripts in directory: $inputDir"
 
 $results = Invoke-ScriptAnalyzer @params |
     Select-Object RuleName,
@@ -63,7 +63,7 @@ $results = Invoke-ScriptAnalyzer @params |
                 Message
 
 
-Write-Host "Writing results to: $outputDir"
+Write-Verbose "Writing results to: $outputDir"
 $fileContent = $results | ConvertTo-Json -Depth 5
 if ($fileContent -notmatch '^\s*\[') {
     $fileContent = "[$fileContent]"
@@ -89,6 +89,7 @@ if($null -eq $pesterModule -or $pesterModule.Version.ToString() -lt '5.5.0'){
 #region Pester Functions
 function ConvertTo-SonarQubeDiagnosticFile
 {
+	[cmdletbinding()]
 	param(
 		[string]$PesterTestReportFile,
 		[string]$CoverageReportFile
@@ -100,7 +101,7 @@ function ConvertTo-SonarQubeDiagnosticFile
 
 	$artifactsDir = Split-Path -Path $PesterTestReportFile -Parent
 	$pesterExecutionReportPath = Join-Path $artifactsDir -ChildPath "SonarExecutionReport.xml"
-    Write-Host "Generating Pester Execution Report: $pesterExecutionReportPath"
+    Write-Verbose "Generating Pester Execution Report: $pesterExecutionReportPath"
 
 	$xmlWriter = Open-XmlWriter -Path $pesterExecutionReportPath
 	Get-ExecutionReport -xmlWriter $xmlWriter -Test $tests -ScriptPath $inputDir
@@ -112,7 +113,7 @@ function ConvertTo-SonarQubeDiagnosticFile
 
 	$pesterCoverageReportPath = Join-Path $artifactsDir -ChildPath "SonarCodeCoverage.xml"
 
-	Write-Host "Generating Coverage Report: $pesterCoverageReportPath"
+	Write-Verbose "Generating Coverage Report: $pesterCoverageReportPath"
 	$xmlWriter = Open-XmlWriter -Path $pesterCoverageReportPath
 	$inputDir = Split-Path -Path $artifactsDir -Parent
 	Get-CodeCoverageReport -Folders $folders -ScriptPath $inputDir -xmlWriter $xmlWriter
@@ -134,6 +135,7 @@ function Get-CodeCoverageReport
         .LINK
             https://docs.sonarsource.com/sonarqube/9.9/analyzing-source-code/test-coverage/generic-test-data/
     #>
+    [cmdletbinding()]
     param(
         [array]$Folders,
         [string]$ScriptPath,
@@ -334,7 +336,7 @@ $coverageReportFile = Join-Path $artifactsPath -ChildPath "PesterTestCoverage.xm
 $testsPath = Join-Path $inputDir -ChildPath "tests"
 
 if(-not (Test-Path -Path $testsPath)) {
-	Write-Verbose "No tests directory found at path: $testsPath"
+	Write-Error "No tests directory found at path: $testsPath"
 	exit
 }
 
@@ -377,41 +379,6 @@ $configuration = @{
 
 $config = New-PesterConfiguration -Hashtable $configuration
 Invoke-Pester -Configuration $config
-
-<#
-# normalize project root: forward slashes and lowercase
-$normalizedInputDir = ($inputDir -replace '\\','/').ToLower()
-
-[xml]$xml = Get-Content $coverageReportFile
-
-if ($xml.DocumentType) {
-    $xml.RemoveChild($xml.DocumentType) | Out-Null
-}
-
-foreach ($package in $xml.report.package) {
-
-    # fix package name
-    $packageNameNormalized = ($package.name -replace '\\','/').ToLower()
-    if ($packageNameNormalized -eq $normalizedInputDir -or $packageNameNormalized.StartsWith($normalizedInputDir + "/")) {
-        $package.name = "."
-    }
-
-    # fix class names
-    foreach ($class in $package.class) {
-     # normalize class name for comparison
-        $classNameNormalized = ($class.name -replace '\\','/').ToLower()
-
-        # remove project root prefix if it matches
-        if ($classNameNormalized.StartsWith($normalizedInputDir)) {
-            $relativePath = $classNameNormalized.Substring($normalizedInputDir.Length).TrimStart('/')
-            $class.name = $relativePath
-        }
-    }
-}
-
-
-$xml.Save($coverageReportFile)
-#>
 
 write-Verbose "Pester test report written to: $coverageReportFile"
 write-Verbose "Starting code coverage report generation."

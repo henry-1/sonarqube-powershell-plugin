@@ -95,11 +95,11 @@
               <Plugin-Class>
                 org.sonar.plugins.psscriptanalyzer.PSScriptAnalyzerPlugin
               </Plugin-Class>
-              <Plugin-Key>sonar-psscriptanalyzer</Plugin-Key>
-              <Plugin-Name>PSScriptAnalyzer Plugin</Plugin-Name>
+              <Plugin-Key>psscriptanalyzer</Plugin-Key>
+              <Plugin-Name>PSScriptAnalyzer and Pester Plugin</Plugin-Name>
               <Plugin-Version>${project.version}</Plugin-Version>
               <Sonar-Version>${sonar.server.version}</Sonar-Version>
-			  <Plugin-Description>PSScriptAnalyzer Integration</Plugin-Description>
+			  <Plugin-Description>PSScriptAnalyzer and Pester Integration</Plugin-Description>
 			  <Plugin-License>Apache-2.0</Plugin-License>
 			  <Plugin-Developers>Henry S.</Plugin-Developers>
 			  <Plugin-Homepage>https://github.com/henry-1/sonarqube-powershell-plugin</Plugin-Homepage>
@@ -135,12 +135,11 @@
 	      </executions>
 	    </plugin>      
     </plugins>
-  </build>
-  
+  </build>  
   
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/henry/sonar-psscriptanalyzer-plugin/issues</url>
+    <url>https://github.com/henry-1/sonar-psscriptanalyzer-plugin/issues</url>
   </issueManagement>
   
   <licenses>
@@ -162,11 +161,11 @@
     </developer>
   </developers>
   
-  <url>https://github.com/henry/sonar-psscriptanalyzer-plugin</url>
+  <url>https://github.com/henry-1/sonar-psscriptanalyzer-plugin</url>
   
   <scm>
-    <connection>scm:git:git://github.com/henry/sonar-psscriptanalyzer-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/henry/sonar-psscriptanalyzer-plugin.git</developerConnection>
-    <url>https://github.com/henry/sonar-psscriptanalyzer-plugin</url>
+    <connection>scm:git:git://github.com/henry-1/sonar-psscriptanalyzer-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/henry-1/sonar-psscriptanalyzer-plugin.git</developerConnection>
+    <url>https://github.com/henry-1/sonar-psscriptanalyzer-plugin</url>
   </scm>
 </project>

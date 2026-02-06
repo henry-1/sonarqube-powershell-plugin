@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -96,23 +98,33 @@ public class PSTokenizerSensor extends BaseSensor implements org.sonar.api.batch
 	                try {
 	                    final String resultsFile = folder.newFile().toPath().toFile().getAbsolutePath();
 	                    
-	                    final String[] args = new String[]{
-	                    		"powershell.exe", 
-	                    	    "-NoProfile", 
-	                    	    "-ExecutionPolicy", "Bypass", 
-	                    	    "-File", scriptFile, 
-	                    	    "-inputFile", findingPath, 
-	                    	    "-output", resultsFile
-	                    	};
-
+	                    List<String> command = new ArrayList<>();
+	                    command.add("powershell.exe");
+	            	    command.add("-NoProfile");
+	            	    command.add("-NonInteractive");
+	            	    command.add("-ExecutionPolicy");
+	            	    command.add("Bypass");
+	            	    command.add("-File");
+	            	    command.add(scriptFile);
+	            	    command.add("-inputFile");
+	            	    command.add(findingPath);
+	            	    command.add("-output");
+	            	    command.add(resultsFile);
+	            	    
+	            	    if(debugOutputEnabled)
+	                    {
+	            	    	command.add("-debugOutputEnabled");
+	                	    command.add(debugOutputEnabled ? "1" : "0");
+	                    	
+	                    }	            	    
+	            	    
                     	if(debugOutputEnabled)
-    	        			System.out.println("Running %s command" + Arrays.toString(args));
+    	        			System.out.println("Running %s command" + Arrays.toString(command.toArray()));
 	                    
-
-	                    final Process process = new ProcessBuilder(args)
-	                    		.directory(baseDir)
-	                            .redirectErrorStream(true)
-	                            .start();
+                    	final Process process = new ProcessBuilder(command)
+                    		.directory(baseDir)
+                            .redirectErrorStream(true)
+                            .start();
 	                    
 	                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 	                        String line;

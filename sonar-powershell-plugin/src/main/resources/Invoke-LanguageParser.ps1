@@ -1,12 +1,25 @@
 param(
 	[string]$inputFile = "C:/DEV/sonar-ps-test/ADSyncFunctions.ps1",
 	[string]$output = "c:/temp/ADSyncFunctions-tokens.xml",
-	[int] $depth = 9999999
+	[int] $depth = 9999999,
+	[string]$debugOutputEnabled = "0"
 )
+
+function ConvertTo-Boolean
+{
+	param(
+		[string]$Value
+	)
+
+	$intValue = [System.Convert]::ToInt16($Value)
+	return $intValue -ne 0
+}
+
+$PSDefaultParameterValues['*:Verbose'] = (ConvertTo-Boolean -Value $debugOutputEnabled)
 
 $text = ([IO.File]::ReadAllText($inputFile)) -replace "\xEF\xBB\xBF", "";
 
-write-host "Input file length: $($text.length) characters"
+write-Verbose "Input file length: $($text.length) characters"
 
 $tokens = $null
 $errors = $null

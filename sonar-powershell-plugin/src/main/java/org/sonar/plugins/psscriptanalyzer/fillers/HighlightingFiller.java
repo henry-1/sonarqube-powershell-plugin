@@ -63,8 +63,6 @@ public class HighlightingFiller implements IFiller {
                 } catch (Throwable e) {
                 	System.err.println(String.format("Exception while adding highlighting for: %s -> %s", token, e.getMessage()));  
                 }
-            	
-            	
             }
             synchronized (context) {
                 highlighting.save();
