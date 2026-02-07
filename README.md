@@ -3,17 +3,15 @@
 * [What the Plugin does](#what-the-plugin-does)
 * [Prerequisites](#prerequisites)
     * [Folder Structure](#folder-structure)
-    * [PSScriptAnalyzer](#psscriptanalyzer)
-    * [Pester](#pester)
-    * [SonarQube](#sonarqube)
+    * [Required Software](#required-software)
 * [Installation](#installation)
 * [Configuration](#configuration)
 * [Illustration](#illustration)
 
 ## What the Plugin does
 - Runs Built-in PSScriptAnalyzer Rules and displays Findings in Code.
-- Integrates custom PSScriptAnalyzer Rules the same way as it handles Buil-in Rules. This Part can be turned on/off in SonarQube Administration.
-- (optionally) Runs Pester Tests and calculates and shows covered parts of the Code (and Code not covered).
+- Integrates custom PSScriptAnalyzer Rules the same way as it handles Built-in Rules. This Part can be turned on/off in SonarQube Administration.
+- Runs Pester Tests and calculates and shows covered parts of the Code (and Code not covered). This Part can also be turned on/off in SonarQube Administration.
 - Calculates and displays
     - Duplicate Code
     - Cyclomatic Complexity
@@ -21,7 +19,6 @@
     - Technical Debt
 - Uses Code Highlighting to make the Scripts more readable.
 - Produces a lot of Debug output if turned on in  SonarQube Administration.
-
 
 This repository contains two different styles of a SonarQube Powershell Plugin.
 
@@ -40,12 +37,13 @@ public PowershellLanguage(final Settings settings)
 Beside this, it has also outdated dependencies. But never the less, the folder "sonarqube-powershell-plugin/src/branch/main/sonar-ps-plugin" contains a working example of gretard's repo.
 
 I started to re-write a new Plugin for the following reasons:
+- First of all I wanted to understand what gretard code is actually doing. And I am now able to update the code on my own.
 - I wanted to be compatible to the current API's.
 - I use custom PSScriptAnalyzer rules and gretard's Plugin must be re-compiled and re-deployed for every new rule I want to use. In my project new rules can be used without any change in the current SonarQube configuration.
 - I also wanted to integrate Pester Test results and Code Coverage from Pester Tests.
 
 But there is a disadvantage which comes with the flexibility!
-In gretard's implementation every rule is baked into the code at compile time. This allows to add much more information to rules.
+In gretard's implementation every rule is baked into the code at compile time. This allows to add much more information to rules. Unforunately SonarQube dos not allow to change the part "Why is this an issue" in the Sensor. At least I did not find a way yet.
 
 I decided to have only 3 rules and every issue is matched to one of these rules based on Severity. I can add more custom PSScriptAnalyzer rules and their findings appear in SonarQube without the need to modify configuration files and re-compile the project.
 
@@ -71,14 +69,14 @@ project/
 
 You can have more sub-folders and manage inclusions and exclusions in the properties file explained later.
 
-## PSScriptAnalyzer
-- Works with PSScriptAnalyzer Version 1.24.0
+## Required Software
 
-## Pester
-- Works with Pester Version 5.7.1
+| Plugin Version | PSScriptAnalyzer | Pester | Java | SonarQube |
+| --- | --- | --- | --- | --- |
+| 0.3.0 | 1.24.0 | 5.7.1 | 17+ | 26.1.0.118079 |
 
-## SonarQube
-- I developed it using Community Build v26.1.0.118079
+
+I run my Tests on Windows 11 (never tested it on Linux).
 
 # Installation
 To install the Plugin just copy the jar file to the 'downloads' folder of your SonarQube instance and restart SonarQube.
