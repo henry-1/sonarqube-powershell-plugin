@@ -39,10 +39,6 @@ build/
 **/.settings/
 **/.scannerwork
 
-# do not exclude the final jar file
-!/sonar-powershell-plugin/target/sonar-psscriptanalyzer-plugin-0.3.0-shaded.jar
-!/sonar-ps-plugin/sonar-ps-plugin/target/sonar-ps-plugin-0.5.3.jar
-
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
 
