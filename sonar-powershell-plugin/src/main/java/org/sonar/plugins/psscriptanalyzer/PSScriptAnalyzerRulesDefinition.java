@@ -3,6 +3,7 @@ package org.sonar.plugins.psscriptanalyzer;
 import org.sonar.api.rule.RuleStatus;
 import org.sonar.api.rule.Severity;
 import org.sonar.api.rules.RuleType;
+import org.sonar.api.server.rule.RuleParamType;
 import org.sonar.api.server.rule.RulesDefinition;
 
 public class PSScriptAnalyzerRulesDefinition implements RulesDefinition {
@@ -42,7 +43,6 @@ public class PSScriptAnalyzerRulesDefinition implements RulesDefinition {
 	        .setHtmlDescription("This is a minor Issue.");
        minorRule.setDebtRemediationFunction(minorRule.debtRemediationFunctions().constantPerIssue(constantPerBugIssue));
 
-       
        NewRule bugRule = repo.createRule(Constants.SENSOR_RULE_TYPE_PSA_FINDING_ERROR)
 	        .setName(Constants.REPOSITORY_NAME)
 	        .setType(RuleType.CODE_SMELL)

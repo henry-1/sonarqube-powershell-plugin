@@ -71,7 +71,7 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	        {
 		        System.out.println("PowerShell script extracted to: " + scriptFile.getAbsolutePath());
 		        System.out.println("Analyzer output will go to: " + outFile.getAbsolutePath());
-	        }
+	        }	        
 	
 	        // Run PowerShell ScriptAnalyzer on entire baseDir
 	        runScriptAnalyzer(baseDir, scriptFile, outFile);

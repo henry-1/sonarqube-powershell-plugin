@@ -18,10 +18,22 @@
     <sonar.api.version>10.0.0.695</sonar.api.version>
     <!-- <sonar.api.version>9.9.0.229</sonar.api.version> -->
     <!-- <sonar.api.version>13.4.3.4290</sonar.api.version> -->
-    <java.version>11</java.version>
+    <!-- <java.version>11</java.version> -->
+    <java.version>17</java.version>
   </properties>
   
   <repositories>
+  <repository>
+    <id>sonarsource-public</id>
+    <url>https://repo1.maven.org/maven2/</url>
+    <releases>
+        <enabled>true</enabled>
+    </releases>
+    <snapshots>
+        <enabled>true</enabled>
+    </snapshots>
+  </repository>
+  <!-- 
     <repository>
         <id>sonarsource-repo</id>
         <url>https://repo.sonarsource.org/artifactory/sonarsource-repo/</url>
@@ -32,12 +44,13 @@
             <enabled>true</enabled>
         </snapshots>
     </repository>
+    -->
   </repositories>
   
   <dependencies>
     <!-- SonarQube Plugin API -->
     <dependency>
-      <groupId>org.sonarsource.api.plugin</groupId>
+      <groupId>org.sonarsource.api.plugin</groupId>      
       <artifactId>sonar-plugin-api</artifactId>
       <version>${sonar.api.version}</version>
       <scope>provided</scope>

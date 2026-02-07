@@ -8,9 +8,15 @@ import java.util.Map;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.issue.NewIssue;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.batch.sensor.issue.fix.NewInputFileEdit;
+import org.sonar.api.batch.sensor.issue.fix.NewQuickFix;
+import org.sonar.api.batch.sensor.issue.fix.NewTextEdit;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.fs.TextRange;
+import org.sonar.api.batch.rule.ActiveRule;
+import org.sonar.api.batch.rule.ActiveRules;
 import org.sonar.api.batch.rule.Severity;
 import org.sonar.plugins.psscriptanalyzer.Constants;
 import org.sonar.plugins.psscriptanalyzer.types.PSFinding;
@@ -84,17 +90,13 @@ public class IssuesFiller {
         		    ", message=" + message
         		);	            
             
-            NewIssue issue = context.newIssue()
-                .forRule(RuleKey.of(Constants.REPOSITORY_KEY, ruleKey));
-                       
-            NewIssueLocation location = issue.newLocation()
-                .on(inputFile)
-                .message(message)	                
-                .at(inputFile.selectLine(findingAtLine));
+            NewIssue issue = context.newIssue();
             
-            issue.at(location)
-            	.overrideSeverity(mapSeverity(severity))
-                .save();	            
+            issue.forRule(RuleKey.of(Constants.REPOSITORY_KEY, ruleKey))
+                .at(issue.newLocation()
+            		.message(message)            		
+            		.on(inputFile).at(inputFile.selectLine(findingAtLine)))
+                .save();          
         }
 	}
 	
