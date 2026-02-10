@@ -36,6 +36,12 @@ public class Constants {
 	public static final String CONFIGURAITON_REMOVETEMPFILES_DEFAULT_VALUE = "true";
 	public static final String CONFIGURAITON_REMOVETEMPFILES_DESCRIPTION = "Remove intermediate Files after Scan.";
 	
+	public static final String CONFIGURAITON_PROPERTY_PSARULES_FOLDERPATH = "psscriptanalyzer.powershellrules.folderpath";
+	public static final String CONFIGURAITON_PROPERTY_PSARULESFOLDERPATH_NAME = "Path to Powershell Rules File";
+	public static final String CONFIGURAITON_PSARULESFILEPATH_DEFAULT_VALUE = "/custom_extensions";
+	public static final String CONFIGURAITON_PSARULESFILEPATH_DESCRIPTION = "This Folder contains your PSA Rules Defintion XML Files.";
+	
+	
 	public static final String CONFIGURATION_PROPERTY_SUBCATEGORY = "Rules";
 	
 	public static final String REPOSITORY_NAME = "PSScriptAnalyzer";

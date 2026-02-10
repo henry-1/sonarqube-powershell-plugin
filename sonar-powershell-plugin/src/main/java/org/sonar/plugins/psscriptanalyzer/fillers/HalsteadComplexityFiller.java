@@ -66,13 +66,13 @@ public class HalsteadComplexityFiller implements IFiller {
                         .save();
                 
                 if(debugOutputEnabled)
-                	System.out.println(String.format("Calculated %s for Cognitive Complexity in %s.", 
+                	System.out.println(String.format("[PSA-Plugin] Calculated %s for Cognitive Complexity in %s.", 
                 			difficulty, 
                 			f.uri().getPath()));
             }
 
         } catch (final Throwable e) {
-        	System.err.println(String.format("Exception while saving cognitive complexity metric -> %s", e.getMessage()));  
+        	System.err.println(String.format("[PSA-Plugin] Exception while saving cognitive complexity metric -> %s", e.getMessage()));  
         }		
 	}
 }

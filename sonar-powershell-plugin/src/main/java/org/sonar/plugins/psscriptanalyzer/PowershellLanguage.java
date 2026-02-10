@@ -19,12 +19,12 @@ public class PowershellLanguage extends AbstractLanguage {
     // File suffixes for PowerShell
     private static final String[] DEFAULT_FILE_SUFFIXES = new String[] { "ps1", "psm1", "psd1" };
 
-    private final Configuration config;
+    //private final Configuration config;
     
     
     public PowershellLanguage(final Configuration configuration) {
         super(KEY, NAME);
-        this.config = configuration;
+        //this.config = configuration;
     }
 
     @Override

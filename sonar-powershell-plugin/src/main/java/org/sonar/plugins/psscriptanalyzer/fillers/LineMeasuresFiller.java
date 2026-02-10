@@ -35,7 +35,7 @@ public class LineMeasuresFiller implements IFiller{
 		
 		
 		if(debugOutputEnabled)
-        	System.out.println("Finding Line Measures for: " + f.uri().getPath());
+        	System.out.println("[PSA-Plugin] Finding Line Measures for: " + f.uri().getPath());
 		
 		final List<Token> tokenList = tokens.getTokens();
 		
@@ -81,11 +81,11 @@ public class LineMeasuresFiller implements IFiller{
                 context.<Integer>newMeasure().on(f).forMetric(CoreMetrics.NCLOC).withValue(nonCommentLineCount).save();  
                 
                 if(debugOutputEnabled)
-                	System.out.println(String.format("Found %s Code Lines and %s Comment Lines in %s.", 
+                	System.out.println(String.format("[PSA-Plugin] Found %s Code Lines and %s Comment Lines in %s.", 
                 			nonCommentLineCount, commentLineCount, f.uri().getPath()));            
             }
         } catch (final Throwable e) {
-        	System.err.println(String.format("Exception while calculating comment lines " + e.getMessage()));            
+        	System.err.println(String.format("[PSA-Plugin] Exception while calculating comment lines " + e.getMessage()));            
         }
     }
 }

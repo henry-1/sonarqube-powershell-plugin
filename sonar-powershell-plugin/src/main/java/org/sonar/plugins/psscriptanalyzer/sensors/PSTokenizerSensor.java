@@ -2,11 +2,7 @@ package org.sonar.plugins.psscriptanalyzer.sensors;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +17,7 @@ import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.utils.TempFolder;
 import org.sonar.plugins.psscriptanalyzer.Constants;
+import org.sonar.plugins.psscriptanalyzer.common.Common;
 import org.sonar.plugins.psscriptanalyzer.fillers.CComplexityFiller;
 import org.sonar.plugins.psscriptanalyzer.fillers.CpdFiller;
 import org.sonar.plugins.psscriptanalyzer.fillers.HalsteadComplexityFiller;
@@ -42,7 +39,7 @@ public class PSTokenizerSensor extends BaseSensor implements org.sonar.api.batch
 			new LineMeasuresFiller(config), 
 			new HalsteadComplexityFiller(config), 
 			new CpdFiller(config),
-			new HighlightingFiller(config)
+			new HighlightingFiller()
 			// new SignificantCodeFiller(config)
 		};
 	
@@ -64,15 +61,18 @@ public class PSTokenizerSensor extends BaseSensor implements org.sonar.api.batch
 				.getBoolean(Constants.CONFIGURAITON_PROPERTY_DEBUGOUTPUTENABLED)
 				.orElse(false);
 		
+		Boolean removeTempFiles = config
+				.getBoolean(Constants.CONFIGURAITON_PROPERTY_REMOVETEMPFILES)
+				.orElse(true);
+		
 		fs = context.fileSystem();
 	    File baseDir = fs.baseDir();
 	    
 	    try {   	
+	    	final File parserFile = Common.extractScript("Invoke-LanguageParser", removeTempFiles);	 
+	    	//final File parserFile = extractScript();	        
 
-	    	final File parserFile = extractScript();	        
-
-	        final String scriptFile = parserFile.getAbsolutePath();
-	        
+	        final String scriptFile = parserFile.getAbsolutePath();	        
 	        
 	        final FilePredicates p = fs.predicates();	        
 	        ExecutorService service = Executors.newWorkStealingPool();
@@ -83,7 +83,7 @@ public class PSTokenizerSensor extends BaseSensor implements org.sonar.api.batch
 	        	
 	        	if (inputFile.type() == InputFile.Type.TEST) {
 	        		if(debugOutputEnabled)
-	        			System.out.println("Skipping test file: " + inputFile.uri().getPath());
+	        			System.out.println("[PSA-Plugin] Skipping test file: " + inputFile.uri().getPath());
 	                continue;
 	            }
 	        	
@@ -119,7 +119,7 @@ public class PSTokenizerSensor extends BaseSensor implements org.sonar.api.batch
 	                    }	            	    
 	            	    
                     	if(debugOutputEnabled)
-    	        			System.out.println("Running %s command" + Arrays.toString(command.toArray()));
+    	        			System.out.println("[PSA-Plugin] Running %s command" + Arrays.toString(command.toArray()));
 	                    
                     	final Process process = new ProcessBuilder(command)
                     		.directory(baseDir)
@@ -136,7 +136,7 @@ public class PSTokenizerSensor extends BaseSensor implements org.sonar.api.batch
 	                    final int pReturnValue = process.waitFor();
 
 	                    if (pReturnValue != 0) {
-	                    	System.err.println(String.format("Tokenizer did not run successfully on %s file. Error was: %s",
+	                    	System.err.println(String.format("[PSA-Plugin] Tokenizer did not run successfully on %s file. Error was: %s",
 	                    			findingPath, read(process)));	                        
 	                        return;
 	                    }
@@ -144,7 +144,7 @@ public class PSTokenizerSensor extends BaseSensor implements org.sonar.api.batch
 	                    final File tokensFile = new File(resultsFile);
 	                    if (!tokensFile.exists() || tokensFile.length() <= 0) {
 	                    	System.err.println(String.format(
-	                                "Tokenizer did not run successfully on %s file. Please check file contents.",
+	                                "[PSA-Plugin] Tokenizer did not run successfully on %s file. Please check file contents.",
 	                                findingPath));	                        
 	                        return;
 	                    }
@@ -156,45 +156,19 @@ public class PSTokenizerSensor extends BaseSensor implements org.sonar.api.batch
 	                    
 
 	                    if (debugOutputEnabled) {
-	                    	System.out.println(String.format("Running analysis for %s to %s finished.", findingPath,
+	                    	System.out.println(String.format("[PSA-Plugin] Running analysis for %s to %s finished.", findingPath,
 	                                resultsFile));	                    	
 	                    }
 
 	                } catch (final Throwable e) {
-	                	System.err.println(String.format("Unexpected exception while running tokenizer on %s. Error is: %s", inputFile, e.getMessage()));
+	                	System.err.println(String.format("[PSA-Plugin] Unexpected exception while running tokenizer on %s. Error is: %s", inputFile, e.getMessage()));
 	                }
 	            });
 	        }	     
 	
 		} catch (Exception e) {
-	        System.err.println("Error running Powershell AST Token Senor: " + e.getMessage());
+	        System.err.println("[PSA-Plugin] Error running Powershell AST Token Senor: " + e.getMessage());
 	        e.printStackTrace();
 	    }
-	}
-	
-	/**
-	 * Extracts the bundled PowerShell script to a temp file
-	 */
-	private File extractScript() throws IOException {
-		
-		Boolean removeTempFiles = config
-				.getBoolean(Constants.CONFIGURAITON_PROPERTY_REMOVETEMPFILES)
-				.orElse(true);
-		
-	    File tempScript = File.createTempFile("Invoke-LanguageParser", ".ps1");
-	    
-	    if(removeTempFiles)
-	    	tempScript.deleteOnExit();
-	
-	    try (InputStream in = getClass().getResourceAsStream("/Invoke-LanguageParser.ps1");
-	         OutputStream out = new FileOutputStream(tempScript)) {
-	
-	        if (in == null) {
-	            throw new IllegalStateException("Invoke-Analyzer.ps1 not found in resources");
-	        }
-	        in.transferTo(out);
-	    }
-	
-	    return tempScript;
 	}
 }

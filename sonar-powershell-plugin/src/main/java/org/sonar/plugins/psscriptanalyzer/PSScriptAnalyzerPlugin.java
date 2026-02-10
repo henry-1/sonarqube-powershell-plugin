@@ -85,6 +85,16 @@ public class PSScriptAnalyzerPlugin implements Plugin {
 	            .category(Constants.REPOSITORY_NAME)
 	            .subCategory(Constants.CONFIGURATION_PROPERTY_SUBCATEGORY)
 	            .onQualifiers(Qualifiers.PROJECT)
+	            .build()	        
+            ,
+	        PropertyDefinition.builder(Constants.CONFIGURAITON_PROPERTY_PSARULES_FOLDERPATH)
+	            .name(Constants.CONFIGURAITON_PROPERTY_PSARULESFOLDERPATH_NAME)
+	            .description(Constants.CONFIGURAITON_PSARULESFILEPATH_DESCRIPTION)
+	            .type(PropertyType.TEXT)
+	            .defaultValue(Constants.CONFIGURAITON_PSARULESFILEPATH_DEFAULT_VALUE)
+	            .category(Constants.REPOSITORY_NAME)
+	            .subCategory(Constants.CONFIGURATION_PROPERTY_SUBCATEGORY)
+	            .onQualifiers(Qualifiers.PROJECT)
 	            .build()
 	        );
     	

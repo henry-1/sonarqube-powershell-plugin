@@ -9,15 +9,14 @@ package org.sonar.plugins.psscriptanalyzer.fillers;
 * 	Only changes to "significant code" are used to calculate modified lines and new code issues. 
 */
 
-import java.util.List;
+//import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
-import org.sonar.api.batch.sensor.code.NewSignificantCode;
+//import org.sonar.api.batch.sensor.code.NewSignificantCode;
 import org.sonar.api.config.Configuration;
 import org.sonar.plugins.psscriptanalyzer.Constants;
-import org.sonar.plugins.psscriptanalyzer.types.Token;
+//import org.sonar.plugins.psscriptanalyzer.types.Token;
 import org.sonar.plugins.psscriptanalyzer.types.Tokens;
 
 public class SignificantCodeFiller implements IFiller{
@@ -35,12 +34,12 @@ public class SignificantCodeFiller implements IFiller{
 	
 	@Override
 	public void fill(SensorContext context, InputFile f, Tokens tokens) {
-		final List<Token> tokenList = tokens.getTokens();
+		//final List<Token> tokenList = tokens.getTokens();
 		
 		if(debugOutputEnabled)
-			System.out.println("Getting significant Code for file " + f.uri().getPath());
+			System.out.println("[PSA-Plugin] Getting significant Code for file " + f.uri().getPath());
 		
-		final NewSignificantCode siginificantCode = context.newSignificantCode().onFile(f);
+		//final NewSignificantCode siginificantCode = context.newSignificantCode().onFile(f);
 		
 		try {	
 			
@@ -62,7 +61,7 @@ public class SignificantCodeFiller implements IFiller{
             */
 		
         } catch (final Throwable e) {
-        	System.err.println(String.format("Exception while saving tokens for %s -> %s", f.uri().getPath(), e.toString()));	
+        	System.err.println(String.format("[PSA-Plugin] Exception while saving tokens for %s -> %s", f.uri().getPath(), e.toString()));	
         }	
 		
 	}

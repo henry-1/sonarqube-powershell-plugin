@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.io.input.BOMInputStream;
 import org.sonar.plugins.psscriptanalyzer.types.Token;
 import org.sonar.plugins.psscriptanalyzer.types.Tokens;
 import org.w3c.dom.Document;
@@ -43,7 +42,7 @@ public class TokensReader {
                 token.setEndColumnNumber(Integer.parseInt(getChildByName(node, "EndColumnNumber").getTextContent()));
                 tokens.getTokens().add(token);
             } catch (Exception e) {
-            	System.err.println("Unexpected error reading results" + e.getMessage());	
+            	System.err.println("[PSA-Plugin] Unexpected error Tokens" + e.getMessage());	
             }
         }
         return tokens;
@@ -58,6 +57,6 @@ public class TokensReader {
             }
 
         }
-        throw new Exception("Child node with name " + name + " was not found");
+        throw new Exception("[PSA-Plugin] Child node with name " + name + " was not found");
     }
 }

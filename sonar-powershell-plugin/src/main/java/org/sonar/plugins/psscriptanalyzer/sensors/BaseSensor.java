@@ -28,17 +28,6 @@ public abstract class BaseSensor implements Sensor {
 
 	@Override
     public void execute(final SensorContext context) {
-        // Fetch skip flag from configuration
-		//Boolean debugOutputEnabled = config
-		//		.getBoolean(Constants.CONFIGURAITON_PROPERTY_DEBUGOUTPUTENABLED)
-		//		.orElse(false);
-
-        //if (skipPlugin) {
-            
-        //    return;
-        //}
-
-        // Run the actual sensor logic
         innerExecute(context);
     }
 	

@@ -34,11 +34,11 @@ public class CComplexityFiller implements IFiller{
                     .save();
                 
                 if(debugOutputEnabled)
-                	System.out.println(String.format("Adding CComplexity of %s to %s file %s.", tokens.getComplexity(), f.language(), f.uri().getPath()));
+                	System.out.println(String.format("[PSA-Plugin] Adding CComplexity of %s to %s file %s.", tokens.getComplexity(), f.language(), f.uri().getPath()));
                 
             }
         } catch (final Throwable e) {
-        	System.err.println(String.format("Exception while saving tokens" + e.getMessage()));
+        	System.err.println(String.format("[PSA-Plugin] Exception while saving tokens" + e.getMessage()));
         }		
 	}
 }

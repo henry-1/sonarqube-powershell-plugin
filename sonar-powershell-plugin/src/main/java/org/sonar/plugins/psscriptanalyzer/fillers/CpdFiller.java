@@ -40,13 +40,13 @@ public class CpdFiller implements IFiller {
 	public void fill(SensorContext context, InputFile f, Tokens tokens) {
 				
 		if(debugOutputEnabled)
-			System.out.println("Getting Cut+Past Detection for file " + f.uri().getPath());
+			System.out.println("[PSA-Plugin] Getting Cut+Past Detection for file " + f.uri().getPath());
 		
 		String[] content = new String[0];
 		try {
 			content = f.contents().split("\\R", -1);
 		} catch (final Throwable e){			
-			System.err.println(String.format("Exception while splitting file content into lines for %s with error %s", f.uri().getPath(), e.getMessage()));
+			System.err.println(String.format("[PSA-Plugin] Exception while splitting file content into lines for %s with error %s", f.uri().getPath(), e.getMessage()));
 			return;
 		}
 		
@@ -96,14 +96,14 @@ public class CpdFiller implements IFiller {
 			                tokenCount++;
 			                	
 			                if(debugOutputEnabled)
-			                	System.out.println(String.format("File: %s -> LineNumber: %s -> TokenText: %s -> TokenStart: %s EndColumn: %s", 
+			                	System.out.println(String.format("[PSA-Plugin] File: %s -> LineNumber: %s -> TokenText: %s -> TokenStart: %s EndColumn: %s", 
 		                			f.uri().getPath(), lineNumber, trimmedLine, startColumn, endColumn));
 			                 
 			             	TextRange textRange = f.newRange(lineNumber, startColumn, lineNumber, endColumn);
 			             	cpdTokens.addToken(textRange, trimmedLine);
 		                }
 		        	}catch(final Throwable e) {                    	
-		            	System.err.println(String.format("Exception while creating TextRange %s", e.getMessage()));
+		            	System.err.println(String.format("[PSA-Plugin] Exception while creating TextRange %s", e.getMessage()));
 		            }
 	        	}        	
 	        }
@@ -113,11 +113,11 @@ public class CpdFiller implements IFiller {
 	        	cpdTokens.save();                
 	            
 	            if(debugOutputEnabled)
-	            	System.out.println(String.format("Found %s tokens for duplcation detection in file %s.",  
+	            	System.out.println(String.format("[PSA-Plugin] Found %s tokens for duplcation detection in file %s.",  
 	            			tokenCount, f.uri().getPath()));        
 	        }
 		} catch (final Throwable e) {
-        	System.err.println(String.format("Exception while Copy&Past Detection: %s", e.getMessage()));            
+        	System.err.println(String.format("[PSA-Plugin] Exception while Copy&Past Detection: %s", e.getMessage()));            
         }
 	}
 }

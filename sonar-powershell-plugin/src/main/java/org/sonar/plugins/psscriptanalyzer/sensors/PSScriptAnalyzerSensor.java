@@ -7,16 +7,14 @@ import org.sonar.api.batch.fs.FileSystem;
 
 import org.sonar.api.config.Configuration;
 import org.sonar.plugins.psscriptanalyzer.Constants;
+import org.sonar.plugins.psscriptanalyzer.common.Common;
 import org.sonar.plugins.psscriptanalyzer.fillers.IssuesFiller;
 import org.sonar.plugins.psscriptanalyzer.readers.FindingsReader;
 import org.sonar.plugins.psscriptanalyzer.types.PSFinding;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
 
@@ -59,7 +57,7 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	    try {   	
 		    
 	        // Extract bundled PowerShell script to temp file
-	        File scriptFile = extractScript();	        
+	    	final File scriptFile = Common.extractScript("Invoke-Analyzer", removeTempFiles);
 	
 	        // Define output JSON in the system temp folder
 	        String tmpRoot = System.getProperty("java.io.tmpdir");
@@ -69,8 +67,8 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	        
 	        if(debugOutputEnabled)
 	        {
-		        System.out.println("PowerShell script extracted to: " + scriptFile.getAbsolutePath());
-		        System.out.println("Analyzer output will go to: " + outFile.getAbsolutePath());
+		        System.out.println("[PSA-Plugin] PowerShell script extracted to: " + scriptFile.getAbsolutePath());
+		        System.out.println("[PSA-Plugin] Analyzer output will go to: " + outFile.getAbsolutePath());
 	        }	        
 	
 	        // Run PowerShell ScriptAnalyzer on entire baseDir
@@ -82,48 +80,17 @@ public class PSScriptAnalyzerSensor implements Sensor {
 	        
 	
 	    } catch (Exception e) {
-	        System.err.println("Error running ScriptAnalyzer: " + e.getMessage());
+	        System.err.println("[PSA-Plugin] Error running ScriptAnalyzer: " + e.getMessage());
 	        e.printStackTrace();
 	    }
 	}
-    
-
-	/**
-	 * Extracts the bundled PowerShell script to a temp file
-	 */
-	private File extractScript() throws IOException {
-		
-		Boolean removeTempFiles = config
-				.getBoolean(Constants.CONFIGURAITON_PROPERTY_REMOVETEMPFILES)
-				.orElse(true);
-		
-	    File tempScript = File.createTempFile("Invoke-Analyzer", ".ps1");
-	    if(removeTempFiles)
-	    	tempScript.deleteOnExit();
-	
-	    try (InputStream in = getClass().getResourceAsStream("/Invoke-Analyzer.ps1");
-	         OutputStream out = new FileOutputStream(tempScript)) {
-	
-	        if (in == null) {
-	            throw new IllegalStateException("Invoke-Analyzer.ps1 not found in resources");
-	        }
-	        in.transferTo(out);
-	    }
-	
-	    return tempScript;
-	}
-	
-	
+    	
 	
 	/**
 	 * Runs PowerShell ScriptAnalyzer on all scripts in the folder
 	 */
 	private void runScriptAnalyzer(File baseDir, File scriptFile, File outFile) throws IOException, InterruptedException {
 	    
-		Boolean removeTempFiles = config
-				.getBoolean(Constants.CONFIGURAITON_PROPERTY_REMOVETEMPFILES)
-				.orElse(true);
-		
 		String customRulesPath = config
                 .get(Constants.CONFIGURAITON_PROPERTY_CUSTOMRULESPATH)
                 .orElse("");
@@ -201,7 +168,7 @@ public class PSScriptAnalyzerSensor implements Sensor {
 
 	    int exitCode = process.waitFor();
 	    if (exitCode != 0) {
-	        throw new RuntimeException("PowerShell ScriptAnalyzer failed with exit code " + exitCode);
+	        throw new RuntimeException("[PSA-Plugin] PowerShell ScriptAnalyzer failed with exit code " + exitCode);
 	    }
 	}
 	

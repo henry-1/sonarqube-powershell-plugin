@@ -7,17 +7,10 @@ import java.util.Map;
 
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.issue.NewIssue;
-import org.sonar.api.batch.sensor.issue.NewIssueLocation;
-import org.sonar.api.batch.sensor.issue.fix.NewInputFileEdit;
-import org.sonar.api.batch.sensor.issue.fix.NewQuickFix;
-import org.sonar.api.batch.sensor.issue.fix.NewTextEdit;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.fs.TextRange;
 import org.sonar.api.batch.rule.ActiveRule;
-import org.sonar.api.batch.rule.ActiveRules;
-import org.sonar.api.batch.rule.Severity;
 import org.sonar.plugins.psscriptanalyzer.Constants;
 import org.sonar.plugins.psscriptanalyzer.types.PSFinding;
 
@@ -51,34 +44,44 @@ public class IssuesFiller {
         	// If still not found → skip
         	if (inputFile == null) {
         		if(debugOutputEnabled)
-        			System.out.println("Skipping finding, file not indexed: " + findingPath);
+        			System.out.println("[PSA-Plugin] Skipping finding, file not indexed: " + findingPath);
         	    continue;
         	}
         	
         	if (inputFile.type() == InputFile.Type.TEST) {
         		if(debugOutputEnabled)
-        			System.out.println("Skipping test file: " + finding.getScriptName());
+        			System.out.println("[PSA-Plugin] Skipping test file: " + finding.getScriptName());
                 continue;
             }		            
             
         	String testName = finding.getTestName();
             int findingAtLine = Math.max(finding.getLine(), 1);
             String severity = finding.getSeverity();
-            String message = finding.getMessage();	            
+            	            
 
             if (findingAtLine > inputFile.lines()) {
             	if(debugOutputEnabled)
 	                System.out.println(
-	                    "Skipping invalid line " + findingAtLine +
+	                    "[PSA-Plugin] Skipping invalid line " + findingAtLine +
 	                    " for file " + inputFile.uri().getPath()
                 );
                 continue;
             }
             
             if(debugOutputEnabled)
-            	System.out.println("File has " + inputFile.lines() + " lines. PSA line: " + findingAtLine);  
+            	System.out.println("[PSA-Plugin] File has " + inputFile.lines() + " lines. PSA line: " + findingAtLine);  
+                        
+            String stringForRuleKey = testName;
+            String message = testName;
             
-            String ruleKey = ruleKeyForSeverity(finding.getSeverity());
+            RuleKey ruleKey = RuleKey.of(Constants.REPOSITORY_KEY, stringForRuleKey);
+            ActiveRule activeRule = context.activeRules().find(ruleKey);
+            
+            if(activeRule == null)
+            {
+            	stringForRuleKey = finding.getRuleKey();  
+            	message = finding.getMessage();
+            }
             
             if(debugOutputEnabled)
             	System.out.println(
@@ -92,51 +95,11 @@ public class IssuesFiller {
             
             NewIssue issue = context.newIssue();
             
-            issue.forRule(RuleKey.of(Constants.REPOSITORY_KEY, ruleKey))
+            issue.forRule(RuleKey.of(Constants.REPOSITORY_KEY, stringForRuleKey))
                 .at(issue.newLocation()
             		.message(message)            		
             		.on(inputFile).at(inputFile.selectLine(findingAtLine)))
                 .save();          
         }
 	}
-	
-	private String ruleKeyForSeverity(String psaSeverity) {
-	    if (psaSeverity == null) {
-	        return Constants.SENSOR_RULE_TYPE_PSA_FINDING_ERROR;
-	    }
-
-	    switch (psaSeverity.toLowerCase()) {
-	        case "information":
-	            return Constants.SENSOR_RULE_TYPE_PSA_FINDING_INFO;
-
-	        case "warning":
-	            return Constants.SENSOR_RULE_TYPE_PSA_FINDING_WARNING;
-
-	        case "error":
-	            return Constants.SENSOR_RULE_TYPE_PSA_FINDING_ERROR;
-
-	        default:
-	            return Constants.SENSOR_RULE_TYPE_PSA_FINDING_ERROR;
-	    }
-	}
-	
-	private Severity mapSeverity(String psaSeverity) {
-		if (psaSeverity == null) {
-	        return Severity.MAJOR;
-	    }
-
-	    switch (psaSeverity.toLowerCase()) {
-	        case "information":
-	            return Severity.INFO;
-
-	        case "warning":
-	            return Severity.MINOR;
-
-	        case "error":
-	            return Severity.MAJOR;
-
-	        default:
-	            return Severity.MAJOR;
-	    }
-	}	
 }
