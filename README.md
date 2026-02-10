@@ -77,7 +77,7 @@ You can have more sub-folders and manage inclusions and exclusions in the proper
 
 | Plugin Version | PSScriptAnalyzer | Pester | Java | SonarQube |
 | --- | --- | --- | --- | --- |
-| 0.3.0 | 1.24.0 | 5.7.1 | 17+ | 26.1.0.118079 |
+| 0.4.0 | 1.24.0 | 5.7.1 | 17+ | 26.1.0.118079 |
 
 
 I run my Tests on Windows 11 (never tested it on Linux).
@@ -123,8 +123,8 @@ For every of these Files, a Rule is created and activated in SonarQube. Possible
 | XML Node Name | Value | Comment | Link |
 | --- | --- | --- | --- |
 | key | PSScriptAnalyzer Test Name | This Name must exactly match the Test Name reported by PSScriptAnaylzer when running Get-ScriptAnalyzerRule ||
-| name | Can be every String | I recomment using the Description of the Get-ScriptAnalyzerRule output | |
-| description | Can be every String | This appears in the "Why is this an Issue" part of the SonarQube GUI. ||
+| description | Can be every String | I recomment using the Description of the Get-ScriptAnalyzerRule output | |
+| whyIsThisAnIssue | Can be every String | This appears in the "Why is this an Issue" part of the SonarQube GUI. ||
 | remediationFunction |CONSTANT_ISSUE<br>LINEAR<br>LINEAR_OFFSET | Costs to fix this Issue. Example:<br>- Constant 5min: per Issue<br>- Linear 5min: but increasing with amount of Lines of Code<br>- LINEAR_OFFSET 2min/5min: 2min base + 5min per Issue | [DebtRemediationFunction.Type](https://javadoc.io/doc/org.sonarsource.sonarqube/sonar-plugin-api/latest/org/sonar/api/server/debt/DebtRemediationFunction.Type.html) |
 | debtRemediationFunctionCoefficient | A Durations String | Used as Base for all 3 Types | [org.sonar.api.utils.Durations](https://javadoc.io/doc/org.sonarsource.sonarqube/sonar-plugin-api/latest/org/sonar/api/utils/Durations.html) |
 | debtRemediationFunctionLinearOffset | A Durations String | Used tgether with DebtRemediationFunction.Type.LINEAR_OFFSET | |
@@ -135,7 +135,7 @@ To deploy Rules (new or additional or updated)
 1. Add or update Rule Files
 2. Copy the Plugin.jar File to the download Folder (again, like for the first Setup, you can use the same File)
 3. Use Marketplace and remove the installed Plugin
-4. Restart SonarQube
+4. Restart SonarQube.
 This is the only Way to load Rules in the SonarQube Database.
 
 # Configuration
@@ -161,8 +161,8 @@ The following options might be important to run the plugin depending on your pro
 | 6 | sonar.exclusions | artifacts/**,tests/*.Tests.ps1 | files and folders which should be excluded from scan |
 | 7 | sonar.dynamicAnalysis | reuseReports | |
 | 8 | sonar.tests | tests | the folder where test files for Pester tests are stored |
-| 9 | sonar.testExecutionReportPaths | artifacts/PesterExecutionReport.xml | I have a "artifacts" folder where reports are stored before they are transmitted to Sonarqube. The filename is currently hardcoded. |
-| 10 | sonar.coverageReportPaths | artifacts/SonarCodeCoverage.xml | Same as testExecutionReportPaths |
+| 9 | sonar.testExecutionReportPaths | artifacts/PesterExecutionReport.xml | I have a "artifacts" folder where reports are stored before they are transmitted to Sonarqube. The filename is currently hardcoded. Used only with Pester. |
+| 10 | sonar.coverageReportPaths | artifacts/SonarCodeCoverage.xml | Same as testExecutionReportPaths. Used only with Pester |
 | 11 | sonar.dependencyCheck.skip | true | there is no dependency check |
 | 12 | sonar.scm.disabled | true | |
 | 13 | sonar.projectVersion | 0.9.001 | you can set every version you like |
