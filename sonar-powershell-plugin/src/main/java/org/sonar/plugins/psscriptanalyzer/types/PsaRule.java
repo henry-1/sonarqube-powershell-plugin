@@ -7,7 +7,6 @@ public class PsaRule {
 	private String description;
 	private String whyIsThisAnIssue;
 	private String remediationFunction;
-	//private String descriptionFormat;
 	private String debtRemediationFunctionLinearOffset;
 	private String debtRemediationFunctionCoefficient;
 	private String severity;
@@ -18,7 +17,6 @@ public class PsaRule {
 		this.description = description;
 		this.whyIsThisAnIssue = whyIsThisAnIssue;
 		
-		//this.descriptionFormat = "MARKDOWN";
 		this.debtRemediationFunctionLinearOffset = "";
 		this.debtRemediationFunctionCoefficient = "5min";
 		this.remediationFunction = "LINEAR";
@@ -43,16 +41,7 @@ public class PsaRule {
     }
 	public String getRemediationFunction() {
         return this.remediationFunction;
-    }
-	
-	/*
-	public void setDescriptionFormat(String descriptionFormat) {
-        this.descriptionFormat = descriptionFormat;
-    }
-	public String getDescriptionFormat() {
-        return this.descriptionFormat;
-    }
-	*/
+    }	
 	
 	public void setDebRemediationFunctionLinearOffset(String debtRemediationFunctionLinearOffset) {
         this.debtRemediationFunctionLinearOffset = debtRemediationFunctionLinearOffset;

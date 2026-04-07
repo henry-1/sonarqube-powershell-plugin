@@ -34,7 +34,6 @@ public class PsaRuleReader {
             getChildText(node, "remediationFunction").ifPresent(rule::setRemediationFunction);
             getChildText(node, "debtRemediationFunctionLinearOffset").ifPresent(rule::setDebRemediationFunctionLinearOffset);
             getChildText(node, "debtRemediationFunctionCoefficient").ifPresent(rule::setDebtRemediationFunctionCoefficient);
-            //getChildText(node, "descriptionFormat").ifPresent(rule::setDescriptionFormat);
              
             return rule;
         

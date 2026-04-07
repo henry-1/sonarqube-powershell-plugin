@@ -10,6 +10,7 @@
     * [Version 0.4.0+](#version-04)
 * [Illustration](#illustration)
 * [Version History](VERSION_HISTORY.md)
+* [Attribution](#attribution)
 
 ## What the Plugin does
 - Runs Built-in PSScriptAnalyzer Rules and displays Findings in Code.
@@ -50,6 +51,8 @@ But there is a disadvantage which comes with the flexibility!
 In gretard's implementation every rule is baked into the code at compile time. This allows to add much more information to rules. Unforunately SonarQube dos not allow to change the part "Why is this an issue" in the Sensor. At least I did not find a way yet.
 
 I decided to have only 3 rules and every issue is matched to one of these rules based on Severity. I can add more custom PSScriptAnalyzer rules and their findings appear in SonarQube without the need to modify configuration files and re-compile the project.
+
+From Version 0.4.0 on, it is possible to define Details for PSScriptAnalyzer Rules in XML Files to overcome the Disadvantage mentioned before. These Files are then loaded into the SonarQube Database and detailed Information is displayed per Finding as for any other built-in Language.
 
 # Prerequisites
 ## Folder Structure
@@ -210,3 +213,11 @@ Here are a few pictures of my running instance.
 ![Maintainablility](/pictures/Project_Numbers_6.png)
 ## Plugin Settings
 ![Plugin Settings](/pictures/Settings.png)
+
+
+## Attribution
+This project is licensed under the MIT License, which allows you to use it freely
+in commercial and non-commercial projects.
+
+If you find this project useful, a mention or link back to this repository is
+greatly appreciated.

@@ -95,10 +95,10 @@ public class IssuesFiller {
             
             NewIssue issue = context.newIssue();
             
-            issue.forRule(RuleKey.of(Constants.REPOSITORY_KEY, stringForRuleKey))
+            issue.forRule(RuleKey.of(Constants.REPOSITORY_KEY, stringForRuleKey))            
                 .at(issue.newLocation()
-            		.message(message)            		
-            		.on(inputFile).at(inputFile.selectLine(findingAtLine)))
+        		.message(message)            		
+        		.on(inputFile).at(inputFile.selectLine(findingAtLine)))
                 .save();          
         }
 	}

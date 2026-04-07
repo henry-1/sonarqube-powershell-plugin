@@ -89,7 +89,6 @@ public class PSScriptAnalyzerRulesDefinition implements RulesDefinition {
 				   .setStatus(RuleStatus.READY)
 				   .setSeverity(psaRule.getSeverity())
 				   .setHtmlDescription(psaRule.getDescription());
-				   //.setInternalKey(psaRule.getKey());
 		   
 		   var f = dynamicRule.debtRemediationFunctions();
 		   String coefficient = psaRule.getDebtRemediationFunctionCoefficient();
